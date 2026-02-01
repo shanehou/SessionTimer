@@ -67,32 +67,32 @@
 
 ### Core Services for User Story 1
 
-- [ ] T021 [US1] Create `src/Services/SessionService.swift` implementing SessionServiceProtocol: createSession, getAllSessions, getSession, updateSession, deleteSession, markAsUsed, toggleFavorite, block operations
-- [ ] T022 [US1] Create `src/Services/TimerEngine.swift` with DispatchSourceTimer-based tick engine, start/stop/pause/resume control, callback handlers
-- [ ] T023 [US1] Create `src/Services/TimerService.swift` implementing TimerServiceProtocol: start, pause, resume, stop, skip, phase transition logic, state management
-- [ ] T024 [P] [US1] Create `src/Services/HapticService.swift` implementing HapticServiceProtocol: prepare, playSetTransition (Heavy), playSessionComplete (Success), playCountdownWarning (Warning), playPauseResume (Light)
-- [ ] T025 [P] [US1] Create `src/Services/AudioService.swift` implementing AudioServiceProtocol: preloadSounds, playWorkStart, playRestStart, playCountdown, playSessionComplete with AVAudioSession mixWithOthers/duckOthers
-- [ ] T026 [P] [US1] Create `src/Services/ScreenService.swift` implementing ScreenServiceProtocol: setScreenAlwaysOn, updateScreenState (Work=on, long Rest=off)
-- [ ] T027 [P] [US1] Create placeholder sound files in `src/Resources/Sounds/` (work_start.wav, rest_start.wav, countdown.wav, session_complete.wav)
+- [X] T021 [US1] Create `src/Services/SessionService.swift` implementing SessionServiceProtocol: createSession, getAllSessions, getSession, updateSession, deleteSession, markAsUsed, toggleFavorite, block operations
+- [X] T022 [US1] Create `src/Services/TimerEngine.swift` with DispatchSourceTimer-based tick engine, start/stop/pause/resume control, callback handlers
+- [X] T023 [US1] Create `src/Services/TimerService.swift` implementing TimerServiceProtocol: start, pause, resume, stop, skip, phase transition logic, state management
+- [X] T024 [P] [US1] Create `src/Services/HapticService.swift` implementing HapticServiceProtocol: prepare, playSetTransition (Heavy), playSessionComplete (Success), playCountdownWarning (Warning), playPauseResume (Light)
+- [X] T025 [P] [US1] Create `src/Services/AudioService.swift` implementing AudioServiceProtocol: preloadSounds, playWorkStart, playRestStart, playCountdown, playSessionComplete with AVAudioSession mixWithOthers/duckOthers
+- [X] T026 [P] [US1] Create `src/Services/ScreenService.swift` implementing ScreenServiceProtocol: setScreenAlwaysOn, updateScreenState (Work=on, long Rest=off)
+- [X] T027 [P] [US1] Create placeholder sound files in `src/Resources/Sounds/` (work_start.wav, rest_start.wav, countdown.wav, session_complete.wav)
 
 ### ViewModels for User Story 1
 
-- [ ] T028 [US1] Create `src/ViewModels/SessionEditorViewModel.swift` with @Observable: name, blocks array, isEditing, validationError, canSave computed, addBlock, deleteBlock, moveBlock, save, validate
-- [ ] T029 [US1] Create `src/ViewModels/TimerViewModel.swift` with @Observable: session, currentBlock, currentSet, currentPhase, remainingSeconds, isPaused, isCompleted, progress, formattedTime, backgroundColor, statusText, start, togglePause, skip, stop
+- [X] T028 [US1] Create `src/ViewModels/SessionEditorViewModel.swift` with @Observable: name, blocks array, isEditing, validationError, canSave computed, addBlock, deleteBlock, moveBlock, save, validate
+- [X] T029 [US1] Create `src/ViewModels/TimerViewModel.swift` with @Observable: session, currentBlock, currentSet, currentPhase, remainingSeconds, isPaused, isCompleted, progress, formattedTime, backgroundColor, statusText, start, togglePause, skip, stop
 
 ### Views for User Story 1
 
-- [ ] T030 [P] [US1] Create `src/Views/Components/BlockEditorRow.swift` - reusable Block editing row (name, setCount, workDuration, restDuration pickers)
-- [ ] T031 [P] [US1] Create `src/Views/Components/DurationPicker.swift` - minutes:seconds picker component
-- [ ] T032 [US1] Create `src/Views/Session/SessionEditorView.swift` - Session creation/editing form with name TextField, Block list, add Block button, save button
-- [ ] T033 [US1] Create `src/Views/Timer/TimerDisplay.swift` - large countdown display (2m legible), current Block name, set count (e.g., "2/3")
-- [ ] T034 [US1] Create `src/Views/Timer/TimerView.swift` - full-screen timer with backgroundColor (Work=black, Rest=green), TimerDisplay, fullscreen gesture support (tap=pause, double-tap=skip, long-press=stop)
-- [ ] T035 [US1] Create `src/Views/Timer/SessionCompleteView.swift` - completion celebration screen with session stats
+- [X] T030 [P] [US1] Create `src/Views/Components/BlockEditorRow.swift` - reusable Block editing row (name, setCount, workDuration, restDuration pickers)
+- [X] T031 [P] [US1] Create `src/Views/Components/DurationPicker.swift` - minutes:seconds picker component
+- [X] T032 [US1] Create `src/Views/Session/SessionEditorView.swift` - Session creation/editing form with name TextField, Block list, add Block button, save button
+- [X] T033 [US1] Create `src/Views/Timer/TimerDisplay.swift` - large countdown display (2m legible), current Block name, set count (e.g., "2/3")
+- [X] T034 [US1] Create `src/Views/Timer/TimerView.swift` - full-screen timer with backgroundColor (Work=black, Rest=green), TimerDisplay, fullscreen gesture support (tap=pause, double-tap=skip, long-press=stop)
+- [X] T035 [US1] Create `src/Views/Timer/SessionCompleteView.swift` - completion celebration screen with session stats
 
 ### Integration for User Story 1
 
-- [ ] T036 [US1] Wire TimerService to HapticService/AudioService/ScreenService - trigger feedback on phase changes
-- [ ] T037 [US1] Create `src/Views/Home/ContentView.swift` as main navigation container with NavigationStack, route to SessionEditorView and TimerView
+- [X] T036 [US1] Wire TimerService to HapticService/AudioService/ScreenService - trigger feedback on phase changes
+- [X] T037 [US1] Create `src/Views/Home/ContentView.swift` as main navigation container with NavigationStack, route to SessionEditorView and TimerView
 
 **Checkpoint**: User Story 1 complete - Users can create Sessions and run through them with full sensory feedback
 
