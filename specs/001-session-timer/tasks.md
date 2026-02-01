@@ -44,16 +44,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T011 Create `src/App/SessionTimerApp.swift` with SwiftData ModelContainer configuration (CloudKit enabled), main WindowGroup entry point
-- [ ] T012 [P] Create `src/Models/TimerPhase.swift` with TimerPhase enum (.work, .rest) - Codable, Sendable
-- [ ] T013 Create `src/Models/Block.swift` with SwiftData @Model: id, name, setCount, workDuration, restDuration, orderIndex, session relationship, computed totalDuration/setDuration
-- [ ] T014 Create `src/Models/Session.swift` with SwiftData @Model: id, name, createdAt, lastUsedAt, isFavorite, sortOrder, blocks relationship (cascade delete), computed totalDuration/totalSets
-- [ ] T015 Create `src/Models/TimerState.swift` with runtime struct: sessionId, currentBlockIndex, currentSet, currentPhase, remainingSeconds, isPaused, startedAt, pausedAt, progress calculation
-- [ ] T016 [P] Create `src/Models/ValidationError.swift` with LocalizedError enum for all validation cases
-- [ ] T017 [P] Create `src/Models/TimerEvent.swift` with enum for timer events (started, paused, resumed, stopped, phaseChanged, etc.)
-- [ ] T018 Create `src/Shared/SessionTimerAttributes.swift` with ActivityAttributes for Live Activity (sessionName, totalBlocks, ContentState)
-- [ ] T019 [P] Create `src/Extensions/TimeInterval+Formatting.swift` with extension for "MM:SS" formatting
-- [ ] T020 [P] Create `src/Extensions/Color+Theme.swift` with theme colors (workBackground, restBackground, textPrimary)
+- [X] T011 Create `src/App/SessionTimerApp.swift` with SwiftData ModelContainer configuration (CloudKit enabled), main WindowGroup entry point
+- [X] T012 [P] Create `src/Models/TimerPhase.swift` with TimerPhase enum (.work, .rest) - Codable, Sendable
+- [X] T013 Create `src/Models/Block.swift` with SwiftData @Model: id, name, setCount, workDuration, restDuration, orderIndex, session relationship, computed totalDuration/setDuration
+- [X] T014 Create `src/Models/Session.swift` with SwiftData @Model: id, name, createdAt, lastUsedAt, isFavorite, sortOrder, blocks relationship (cascade delete), computed totalDuration/totalSets
+- [X] T015 Create `src/Models/TimerState.swift` with runtime struct: sessionId, currentBlockIndex, currentSet, currentPhase, remainingSeconds, isPaused, startedAt, pausedAt, progress calculation
+- [X] T016 [P] Create `src/Models/ValidationError.swift` with LocalizedError enum for all validation cases
+- [X] T017 [P] Create `src/Models/TimerEvent.swift` with enum for timer events (started, paused, resumed, stopped, phaseChanged, etc.)
+- [X] T018 Create `src/Shared/SessionTimerAttributes.swift` with ActivityAttributes for Live Activity (sessionName, totalBlocks, ContentState)
+- [X] T019 [P] Create `src/Extensions/TimeInterval+Formatting.swift` with extension for "MM:SS" formatting
+- [X] T020 [P] Create `src/Extensions/Color+Theme.swift` with theme colors (workBackground, restBackground, textPrimary)
 
 **Checkpoint**: Foundation ready - SwiftData models defined, shared types available
 
