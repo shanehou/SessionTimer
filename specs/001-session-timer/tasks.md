@@ -25,16 +25,16 @@
 
 **Purpose**: Project initialization, build configuration, and basic structure
 
-- [ ] T001 Create XcodeGen configuration `src/project.yml` with targets (SessionTimer, SessionTimerWidgets), Swift 6.0, iOS 16.1+ deployment target
-- [ ] T002 [P] Create `src/Makefile` with generate, build, run-simulator, run-device, test, clean targets
-- [ ] T003 [P] Create `src/scripts/generate.sh` for Xcode project generation
-- [ ] T004 [P] Create `src/scripts/build.sh` for project compilation
-- [ ] T005 [P] Create `src/scripts/run.sh` for build and run to device
-- [ ] T006 [P] Create `src/scripts/test.sh` for running tests
-- [ ] T007 Create `src/App/Info.plist` with NSSupportsLiveActivities, UIBackgroundModes (audio)
-- [ ] T008 [P] Create `src/App/SessionTimer.entitlements` with iCloud and CloudKit capabilities
-- [ ] T009 [P] Create `src/Resources/Assets.xcassets` with AppIcon placeholder
-- [ ] T010 Run `make generate` to generate `SessionTimer.xcodeproj` and verify project builds
+- [X] T001 Create XcodeGen configuration `src/project.yml` with targets (SessionTimer, SessionTimerWidgets), Swift 6.0, iOS 16.1+ deployment target
+- [X] T002 [P] Create `src/Makefile` with generate, build, run-simulator, run-device, test, clean targets
+- [X] T003 [P] Create `src/scripts/generate.sh` for Xcode project generation
+- [X] T004 [P] Create `src/scripts/build.sh` for project compilation
+- [X] T005 [P] Create `src/scripts/run.sh` for build and run to device
+- [X] T006 [P] Create `src/scripts/test.sh` for running tests
+- [X] T007 Create `src/App/Info.plist` with NSSupportsLiveActivities, UIBackgroundModes (audio)
+- [X] T008 [P] Create `src/App/SessionTimer.entitlements` with iCloud and CloudKit capabilities
+- [X] T009 [P] Create `src/Resources/Assets.xcassets` with AppIcon placeholder
+- [X] T010 Run `make generate` to generate `SessionTimer.xcodeproj` and verify project builds
 
 ---
 
