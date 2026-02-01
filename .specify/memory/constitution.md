@@ -2,14 +2,15 @@
   ============================================================================
   SYNC IMPACT REPORT
   ============================================================================
-  Version Change: N/A → 1.0.0 (Initial adoption)
+  Version Change: 1.0.0 → 1.1.0
 
   Added Sections:
   - Core Vision (核心愿景)
   - Section I: Interaction Principles (交互原则) - Articles 1-3
   - Section II: Data & Structural Principles (数据模型与结构原则) - Articles 4-5
   - Section III: Platform Specifics (iOS 平台特性规范) - Articles 6-7
-  - Section IV: Visual Constraints (视觉设计底线) - Article 8
+  - Section IV: Development Toolchain (开发工具链规范) - Articles 8-9 [NEW in v1.1.0]
+  - Section V: Visual Constraints (视觉设计底线) - Article 10
   - Governance
 
   Templates Status:
@@ -132,9 +133,54 @@
 - 当处于**长 Rest（> 60s）**时，允许屏幕变暗以省电
 - 在休息倒计时结束前 **5 秒**，必须唤醒屏幕或发送强提醒
 
-## Section IV: Visual Constraints (视觉设计底线)
+## Section IV: Development Toolchain (开发工具链规范)
 
-### Article 8. Distance Legibility (远距离可读性)
+### Article 8. Declarative Project Configuration (声明式项目配置)
+
+为避免 Xcode 项目文件冲突和手动维护负担，项目必须使用声明式配置。
+
+**原则**：
+- **严禁修改项目配置**：绝对禁止直接修改 `.xcodeproj` 或 `project.pbxproj` 文件。
+- **文档驱动 (SDD)**：在编写复杂功能前，MUST 先阅读或生成 `specs/` 下的文档。
+- **语言规范**：思考过程、注释和文档使用**中文**；代码命名使用**英文**。
+- 使用 **XcodeGen** 从 `project.yml` 生成 `.xcodeproj`
+- `.xcodeproj` 文件由工具生成，**不纳入版本控制**
+- 新增/删除/移动源文件后，运行 `xcodegen generate` 即可同步
+
+**禁止**：
+- 手动在 Xcode 中添加或移动文件到项目
+- 直接编辑 `.pbxproj` 文件
+
+### Article 9. Automated Build Pipeline (自动化构建流水线)
+
+开发过程中的构建、测试、运行必须自动化。
+
+**必须实现**：
+
+**构建美化**：
+- 使用 **xcbeautify** 美化 xcodebuild 输出，提升可读性
+
+**一键运行**：
+- 提供脚本自动检测连接的 iOS 设备
+- 支持命令行一键编译 + 安装 + 运行到设备
+- 构建失败时清晰显示错误位置
+
+**推荐工具链**：
+```bash
+# 生成项目
+xcodegen generate
+
+# 构建并运行（自动检测设备）
+./scripts/run.sh
+```
+
+**禁止**：
+- 要求开发者必须打开 Xcode GUI 才能运行应用
+- 构建输出混乱难以阅读
+
+## Section V: Visual Constraints (视觉设计底线)
+
+### Article 10. Distance Legibility (远距离可读性)
 
 **原则**：
 - 核心计时数字（Timer）在 **2 米距离**（如手机放在健身房地板，人站立时）必须清晰可见
@@ -168,4 +214,12 @@
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-01 | **Last Amended**: 2026-02-01
+**Version**: 1.1.0 | **Ratified**: 2026-02-01 | **Last Amended**: 2026-02-01
+
+### Changelog
+
+#### v1.1.0 (2026-02-01)
+- **MINOR**: Added Section IV: Development Toolchain (Articles 8-9)
+  - Article 8: Declarative Project Configuration (XcodeGen)
+  - Article 9: Automated Build Pipeline (xcbeautify, 一键运行)
+- **MINOR**: Original Article 8 → Article 10

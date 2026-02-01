@@ -2,6 +2,9 @@
 #
 # gitignore contributors: remember to update Global Business Insights/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+## XcodeGen - Generated project files (regenerate with `xcodegen generate`)
+*.xcodeproj/
+
 ## User settings
 xcuserdata/
 
