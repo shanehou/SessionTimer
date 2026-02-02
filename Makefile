@@ -12,6 +12,7 @@ build:
 	xcodebuild -project SessionTimer.xcodeproj \
 	           -scheme SessionTimer \
 	           -destination 'generic/platform=iOS' \
+	           -allowProvisioningUpdates \
 	           build | xcbeautify
 
 run-simulator:

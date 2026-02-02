@@ -106,15 +106,16 @@
 
 ### Views for User Story 2
 
-- [ ] T038 [US2] Create `src/ViewModels/SessionListViewModel.swift` with @Observable: sessions array, searchText, filteredSessions computed, loadSessions, delete, toggleFavorite, start
-- [ ] T039 [P] [US2] Create `src/Views/Components/SessionCard.swift` - Session list item showing name, total duration, Block count, favorite indicator
-- [ ] T040 [US2] Create `src/Views/Home/SessionListView.swift` - main list view with @Query sorted by isFavorite/lastUsedAt, search bar, swipe actions (delete, favorite), tap to view detail, one-tap start button
-- [ ] T041 [US2] Create `src/Views/Session/SessionDetailView.swift` - Session overview with Block list, total duration, edit button, start button
+- [X] T038 [US2] Create `src/ViewModels/SessionListViewModel.swift` with @Observable: sessions array, searchText, filteredSessions computed, loadSessions, delete, toggleFavorite, start
+- [X] T039 [P] [US2] Create `src/Views/Components/SessionCard.swift` - Session list item showing name, total duration, Block count, favorite indicator
+- [X] T040 [US2] Create `src/Views/Home/SessionListView.swift` - main list view with @Query sorted by isFavorite/lastUsedAt, search bar, swipe actions (delete, favorite), tap to view detail, one-tap start button
+- [X] T041 [US2] Create `src/Views/Session/SessionDetailView.swift` - Session overview with Block list, total duration, edit button, start button
 
 ### Integration for User Story 2
 
-- [ ] T042 [US2] Update `src/Views/Home/ContentView.swift` to use SessionListView as root, add navigation to SessionDetailView and SessionEditorView
-- [ ] T043 [US2] Implement SessionService.markAsUsed() call when starting a Session to update lastUsedAt
+- [X] T042 [US2] Update `src/Views/Home/ContentView.swift` to use SessionListView as root, add navigation to SessionDetailView and SessionEditorView
+- [X] T043 [US2] Implement SessionService.markAsUsed() call when starting a Session to update lastUsedAt
+  - **实现**: 在 `TimerViewModel.start()` 中调用 `session.markAsUsed()`
 
 **Checkpoint**: User Story 2 complete - Users can save, browse, and one-tap start Sessions
 
@@ -128,9 +129,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T044 [US3] Enhance `src/Views/Timer/TimerView.swift` with full-screen gesture recognition: .onTapGesture(count: 1) for pause/resume, .onTapGesture(count: 2) for skip, .onLongPressGesture(minimumDuration: 1.0) for stop
-- [ ] T045 [US3] Add paused state visual indicator to TimerDisplay (pulsing animation or "PAUSED" overlay)
-- [ ] T046 [US3] Implement skip logic in TimerService: Work→Rest, Rest→next Work, last phase→complete Session
+- [X] T044 [US3] Enhance `src/Views/Timer/TimerView.swift` with full-screen gesture recognition: .onTapGesture(count: 1) for pause/resume, .onTapGesture(count: 2) for skip, .onLongPressGesture(minimumDuration: 1.0) for stop
+- [X] T045 [US3] Add paused state visual indicator to TimerDisplay (pulsing animation or "PAUSED" overlay)
+- [X] T046 [US3] Implement skip logic in TimerService: Work→Rest, Rest→next Work, last phase→complete Session
 
 **Checkpoint**: User Story 3 complete - Full eyes-free control during timer operation
 
@@ -144,10 +145,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T047 [US4] Enhance SessionEditorViewModel init(session:) for edit mode - populate from existing Session
-- [ ] T048 [US4] Add edit button to SessionDetailView that navigates to SessionEditorView in edit mode
-- [ ] T049 [US4] Implement swipe-to-delete in SessionListView with confirmation alert
-- [ ] T050 [US4] Add delete Session option in SessionDetailView with confirmation
+- [X] T047 [US4] Enhance SessionEditorViewModel init(session:) for edit mode - populate from existing Session
+- [X] T048 [US4] Add edit button to SessionDetailView that navigates to SessionEditorView in edit mode
+- [X] T049 [US4] Implement swipe-to-delete in SessionListView with confirmation alert
+- [X] T050 [US4] Add delete Session option in SessionDetailView with confirmation
 
 **Checkpoint**: User Story 4 complete - Full CRUD operations for Sessions
 
