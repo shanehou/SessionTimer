@@ -3,19 +3,9 @@
 
 import UIKit
 
-/// 屏幕服务协议
+/// 屏幕控制服务
 @MainActor
-protocol ScreenServiceProtocol {
-    /// 设置屏幕常亮
-    func setScreenAlwaysOn(_ enabled: Bool)
-    
-    /// 根据计时状态更新屏幕常亮
-    func updateScreenState(for phase: TimerPhase, restDuration: Int)
-}
-
-/// 屏幕控制服务实现
-@MainActor
-final class ScreenService: ScreenServiceProtocol {
+final class ScreenService {
     // MARK: - Properties
     
     /// 长休息时间阈值（秒）- 超过此阈值的休息时间会关闭屏幕常亮
@@ -27,7 +17,7 @@ final class ScreenService: ScreenServiceProtocol {
     /// 是否启用智能屏幕控制
     var isSmartScreenControlEnabled: Bool = true
     
-    // MARK: - ScreenServiceProtocol
+    // MARK: - Public Methods
     
     /// 设置屏幕常亮
     /// - Parameter enabled: 是否保持屏幕常亮

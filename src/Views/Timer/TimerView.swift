@@ -92,7 +92,7 @@ struct TimerView: View {
                     }
                 }
         )
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .statusBar(hidden: true)
         .persistentSystemOverlays(.hidden)
         .onAppear {

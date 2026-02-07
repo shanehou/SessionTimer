@@ -116,14 +116,4 @@ extension Block {
         totalDuration.formattedDuration
     }
     
-    /// 创建 Block 的副本（用于编辑）
-    func copy() -> Block {
-        Block(
-            name: name,
-            setCount: setCount,
-            workDuration: workDuration,
-            restDuration: restDuration,
-            orderIndex: orderIndex
-        )
-    }
 }

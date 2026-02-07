@@ -3,28 +3,9 @@
 
 import UIKit
 
-/// 触觉反馈服务协议
+/// 触觉反馈服务
 @MainActor
-protocol HapticServiceProtocol {
-    /// 准备触觉引擎
-    func prepare()
-    
-    /// 播放组切换反馈 (Heavy Impact)
-    func playSetTransition()
-    
-    /// 播放 Session 完成反馈 (Success)
-    func playSessionComplete()
-    
-    /// 播放倒计时警告反馈 (Warning)
-    func playCountdownWarning()
-    
-    /// 播放暂停/继续反馈 (Light Impact)
-    func playPauseResume()
-}
-
-/// 触觉反馈服务实现
-@MainActor
-final class HapticService: HapticServiceProtocol {
+final class HapticService {
     // MARK: - Properties
     
     /// Heavy Impact 反馈生成器（用于组切换）
@@ -49,7 +30,7 @@ final class HapticService: HapticServiceProtocol {
         prepare()
     }
     
-    // MARK: - HapticServiceProtocol
+    // MARK: - Public Methods
     
     /// 准备触觉引擎
     func prepare() {

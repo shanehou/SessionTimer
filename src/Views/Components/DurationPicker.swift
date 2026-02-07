@@ -46,7 +46,7 @@ struct DurationPicker: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(Color(.systemGray6))
-                .cornerRadius(8)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
@@ -172,49 +172,9 @@ struct DurationPickerSheet: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(Color(.systemGray5))
-                .cornerRadius(8)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Compact Duration Picker
-
-/// 紧凑型时长选择器（用于列表行内）
-struct CompactDurationPicker: View {
-    @Binding var seconds: Int
-    let label: String
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            // 分钟
-            Picker("分钟", selection: Binding(
-                get: { seconds / 60 },
-                set: { seconds = $0 * 60 + seconds % 60 }
-            )) {
-                ForEach(0..<100, id: \.self) { minute in
-                    Text("\(minute)").tag(minute)
-                }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 60)
-            
-            Text(":")
-                .font(.headline)
-            
-            // 秒
-            Picker("秒", selection: Binding(
-                get: { seconds % 60 },
-                set: { seconds = (seconds / 60) * 60 + $0 }
-            )) {
-                ForEach(0..<60, id: \.self) { second in
-                    Text(String(format: "%02d", second)).tag(second)
-                }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 60)
-        }
-        .accessibilityLabel(label)
     }
 }
 
@@ -229,8 +189,6 @@ struct CompactDurationPicker: View {
                 Text("当前值: \(duration)秒")
                 
                 DurationPicker(seconds: $duration, label: "练习时间")
-                
-                CompactDurationPicker(seconds: $duration, label: "练习时间")
             }
             .padding()
         }

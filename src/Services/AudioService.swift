@@ -3,31 +3,9 @@
 
 import AVFoundation
 
-/// 音频服务协议
+/// 音频服务
 @MainActor
-protocol AudioServiceProtocol {
-    /// 是否启用音效
-    var isSoundEnabled: Bool { get set }
-    
-    /// 预加载所有音效
-    func preloadSounds()
-    
-    /// 播放 Work 开始音效
-    func playWorkStart()
-    
-    /// 播放 Rest 开始音效
-    func playRestStart()
-    
-    /// 播放倒计时音效 (最后 3 秒)
-    func playCountdown()
-    
-    /// 播放 Session 完成音效
-    func playSessionComplete()
-}
-
-/// 音频服务实现
-@MainActor
-final class AudioService: AudioServiceProtocol {
+final class AudioService {
     // MARK: - Properties
     
     /// 是否启用音效
@@ -79,11 +57,13 @@ final class AudioService: AudioServiceProtocol {
             try session.setActive(true)
             isSessionConfigured = true
         } catch {
+            #if DEBUG
             print("Failed to configure audio session: \(error)")
+            #endif
         }
     }
     
-    // MARK: - AudioServiceProtocol
+    // MARK: - Public Methods
     
     /// 预加载所有音效
     func preloadSounds() {
@@ -126,11 +106,15 @@ final class AudioService: AudioServiceProtocol {
                 player.prepareToPlay()
                 players[soundFile.rawValue] = player
             } catch {
+                #if DEBUG
                 print("Failed to load sound \(soundFile.rawValue): \(error)")
+                #endif
             }
         } else {
             // 如果找不到音效文件，使用系统音效作为后备
+            #if DEBUG
             print("Sound file not found: \(soundFile.rawValue).\(soundFile.fileExtension)")
+            #endif
         }
     }
     
@@ -201,13 +185,17 @@ extension AudioService {
                     player.prepareToPlay()
                     AudioService.silentPlayer = player
                 } catch {
+                    #if DEBUG
                     print("[AudioService] Failed to create silent player: \(error)")
+                    #endif
                 }
             }
         }
         
         AudioService.silentPlayer?.play()
+        #if DEBUG
         print("[AudioService] Background audio session started")
+        #endif
     }
     
     /// 结束后台音频会话
@@ -219,8 +207,12 @@ extension AudioService {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             isSessionConfigured = false
         } catch {
+            #if DEBUG
             print("[AudioService] Failed to deactivate audio session: \(error)")
+            #endif
         }
+        #if DEBUG
         print("[AudioService] Background audio session ended")
+        #endif
     }
 }

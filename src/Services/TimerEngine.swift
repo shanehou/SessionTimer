@@ -33,19 +33,12 @@ final class TimerEngine {
     /// 上次 tick 时间
     private var lastTickTime: CFTimeInterval = 0
     
-    /// 用于追踪的唯一 ID
-    private var engineId: UUID = UUID()
-    
-    /// Timer 创建计数（用于调试）
-    private var timerCreationCount: Int = 0
-    
     // MARK: - Initializer
     
     /// 创建计时引擎
     /// - Parameter interval: 计时间隔，默认 1.0 秒
     init(interval: TimeInterval = 1.0) {
         self.interval = interval
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] 初始化")
     }
     
     deinit {
@@ -63,7 +56,6 @@ final class TimerEngine {
     
     /// 启动计时器
     func start() {
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] start() called, isRunning=\(isRunning)")
         stop() // 先停止任何现有的计时器
         
         isRunning = true
@@ -75,7 +67,6 @@ final class TimerEngine {
     
     /// 停止计时器
     func stop() {
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] stop() called, isRunning=\(isRunning), displayLink=\(displayLink != nil)")
         invalidateDisplayLink()
         isRunning = false
         isSuspended = false
@@ -83,25 +74,17 @@ final class TimerEngine {
     
     /// 暂停计时器
     func pause() {
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] pause() called, isRunning=\(isRunning), isSuspended=\(isSuspended)")
-        
         isRunning = true
         isSuspended = true
         displayLink?.isPaused = true
-        
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] pause() done, displayLink.isPaused=\(displayLink?.isPaused ?? true)")
     }
     
     /// 继续计时器
     func resume() {
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] resume() called, isRunning=\(isRunning), isSuspended=\(isSuspended)")
-        
         isRunning = true
         isSuspended = false
         lastTickTime = CACurrentMediaTime() // 重置时间，避免暂停期间累积
         displayLink?.isPaused = false
-        
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] resume() done, displayLink.isPaused=\(displayLink?.isPaused ?? true)")
     }
     
     // MARK: - Private Methods
@@ -109,10 +92,6 @@ final class TimerEngine {
     /// 创建 DisplayLink
     private func createDisplayLink() {
         invalidateDisplayLink()
-        
-        timerCreationCount += 1
-        let currentCount = timerCreationCount
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] createDisplayLink() #\(currentCount)")
         
         // 创建一个 wrapper 对象来持有 displayLink 的 target
         let link = CADisplayLink(target: DisplayLinkTarget(handler: { [weak self] in
@@ -126,14 +105,11 @@ final class TimerEngine {
         
         link.add(to: .main, forMode: .common)
         self.displayLink = link
-        
-        print("[TimerEngine-\(engineId.uuidString.prefix(8))] DisplayLink #\(currentCount) created, displayLink=\(self.displayLink != nil)")
     }
     
     /// 销毁 DisplayLink
     private func invalidateDisplayLink() {
         if let link = displayLink {
-            print("[TimerEngine-\(engineId.uuidString.prefix(8))] invalidateDisplayLink()")
             link.invalidate()
         }
         displayLink = nil
@@ -152,7 +128,6 @@ final class TimerEngine {
             // 这样可以避免累积误差，保持精确的节奏
             // 如果有多个 interval 累积（例如应用被暂停后恢复），会触发多次 tick
             lastTickTime += interval
-            print("[TimerEngine-\(engineId.uuidString.prefix(8))] tick at \(currentTime), elapsed=\(String(format: "%.3f", elapsed))")
             tickHandler?()
             
             // 如果累积了多个 interval（例如应用后台恢复），继续处理
@@ -160,7 +135,6 @@ final class TimerEngine {
             var catchUpCount = 0
             while CACurrentMediaTime() - lastTickTime >= interval && catchUpCount < 5 {
                 lastTickTime += interval
-                print("[TimerEngine-\(engineId.uuidString.prefix(8))] catch-up tick #\(catchUpCount + 1)")
                 tickHandler?()
                 catchUpCount += 1
             }
@@ -168,7 +142,6 @@ final class TimerEngine {
             // 如果仍然落后太多，重置到当前时间（避免无限追赶）
             if CACurrentMediaTime() - lastTickTime >= interval * 2 {
                 lastTickTime = CACurrentMediaTime()
-                print("[TimerEngine-\(engineId.uuidString.prefix(8))] reset lastTickTime due to large drift")
             }
         }
     }
@@ -200,24 +173,4 @@ extension TimerEngine {
         start()
     }
     
-    /// 重置计时器
-    func reset() {
-        stop()
-        tickHandler = nil
-    }
-    
-    /// 是否处于暂停状态
-    var isPaused: Bool {
-        isSuspended
-    }
-}
-
-// MARK: - Deinit
-
-extension TimerEngine {
-    /// 确保 Timer 被正确清理
-    func cleanup() {
-        stop()
-        tickHandler = nil
-    }
 }

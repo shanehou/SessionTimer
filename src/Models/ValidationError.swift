@@ -12,6 +12,7 @@ enum ValidationError: LocalizedError, Sendable {
     case invalidSetCount
     case invalidDuration
     case zeroDuration
+    case sessionNotFound
     
     var errorDescription: String? {
         switch self {
@@ -29,6 +30,8 @@ enum ValidationError: LocalizedError, Sendable {
             return "时间必须在 0-99:59 之间"
         case .zeroDuration:
             return "练习时间和休息时间不能都为 0"
+        case .sessionNotFound:
+            return "练习计划不存在或已被删除"
         }
     }
     
@@ -48,6 +51,8 @@ enum ValidationError: LocalizedError, Sendable {
             return "请设置 0 到 99 分 59 秒之间的时间"
         case .zeroDuration:
             return "练习时间或休息时间至少有一个需要大于 0"
+        case .sessionNotFound:
+            return "请返回列表重新选择一个练习计划"
         }
     }
 }

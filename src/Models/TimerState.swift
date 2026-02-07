@@ -26,12 +26,6 @@ struct TimerState: Sendable {
     /// 是否暂停
     var isPaused: Bool
     
-    /// 开始时间
-    var startedAt: Date
-    
-    /// 暂停时间
-    var pausedAt: Date?
-    
     // MARK: - Initializer
     
     /// 创建初始计时状态
@@ -48,16 +42,9 @@ struct TimerState: Sendable {
         self.remainingSeconds = firstBlock?.workDuration ?? 0
         
         self.isPaused = false
-        self.startedAt = Date()
-        self.pausedAt = nil
     }
     
     // MARK: - Computed Properties
-    
-    /// 是否正在运行（未暂停）
-    var isRunning: Bool {
-        !isPaused
-    }
     
     /// 计算总进度百分比 (0.0 - 1.0)
     /// - Parameter session: 当前 Session
@@ -113,7 +100,6 @@ extension TimerState {
     func paused() -> TimerState {
         var state = self
         state.isPaused = true
-        state.pausedAt = Date()
         return state
     }
     
@@ -122,7 +108,6 @@ extension TimerState {
     func resumed() -> TimerState {
         var state = self
         state.isPaused = false
-        state.pausedAt = nil
         return state
     }
     

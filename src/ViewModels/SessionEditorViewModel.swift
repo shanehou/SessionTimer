@@ -83,8 +83,11 @@ final class SessionEditorViewModel {
     /// 验证错误信息
     var validationError: ValidationError?
     
-    /// 是否显示验证错误
-    var showValidationError: Bool = false
+    /// 是否显示验证错误（由 validationError 驱动）
+    var showValidationError: Bool {
+        get { validationError != nil }
+        set { if !newValue { validationError = nil } }
+    }
     
     // MARK: - Computed Properties
     
@@ -173,20 +176,17 @@ final class SessionEditorViewModel {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedName.isEmpty {
             validationError = .emptySessionName
-            showValidationError = true
             return false
         }
         
         // 验证 Blocks
         if blocks.isEmpty {
             validationError = .noBlocks
-            showValidationError = true
             return false
         }
         
         if blocks.count > Session.ValidationConstants.maxBlocks {
             validationError = .tooManyBlocks(max: Session.ValidationConstants.maxBlocks)
-            showValidationError = true
             return false
         }
         
@@ -194,31 +194,26 @@ final class SessionEditorViewModel {
         for block in blocks {
             if block.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 validationError = .emptyBlockName
-                showValidationError = true
                 return false
             }
             
             if block.setCount < 1 || block.setCount > 99 {
                 validationError = .invalidSetCount
-                showValidationError = true
                 return false
             }
             
             if block.workDuration < 0 || block.workDuration > 5999 {
                 validationError = .invalidDuration
-                showValidationError = true
                 return false
             }
             
             if block.restDuration < 0 || block.restDuration > 5999 {
                 validationError = .invalidDuration
-                showValidationError = true
                 return false
             }
             
             if block.workDuration == 0 && block.restDuration == 0 {
                 validationError = .zeroDuration
-                showValidationError = true
                 return false
             }
         }
@@ -247,7 +242,7 @@ final class SessionEditorViewModel {
             descriptor.fetchLimit = 1
             
             guard let session = try? modelContext.fetch(descriptor).first else {
-                throw ValidationError.emptySessionName  // Session 不存在
+                throw ValidationError.sessionNotFound
             }
             
             // 更新名称
@@ -282,7 +277,6 @@ final class SessionEditorViewModel {
     /// 清除验证错误
     func clearValidationError() {
         validationError = nil
-        showValidationError = false
     }
 }
 

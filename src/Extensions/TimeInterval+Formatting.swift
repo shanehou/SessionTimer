@@ -13,31 +13,13 @@ extension TimeInterval {
         return String(format: "%02d:%02d", minutes, seconds)
     }
     
-    /// 格式化为 "M:SS" 格式（分钟不补零）
-    /// - Returns: 格式化的时间字符串
-    var formatted_MSS: String {
-        let totalSeconds = Int(self)
-        let minutes = totalSeconds / 60
-        let seconds = totalSeconds % 60
-        return String(format: "%d:%02d", minutes, seconds)
-    }
 }
 
 extension Int {
     /// 将秒数格式化为 "MM:SS" 格式
     /// - Returns: 格式化的时间字符串
     var formatted_MMSS: String {
-        let minutes = self / 60
-        let seconds = self % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
-    /// 将秒数格式化为 "M:SS" 格式（分钟不补零）
-    /// - Returns: 格式化的时间字符串
-    var formatted_MSS: String {
-        let minutes = self / 60
-        let seconds = self % 60
-        return String(format: "%d:%02d", minutes, seconds)
+        TimeInterval(self).formatted_MMSS
     }
     
     /// 将秒数格式化为可读的时长描述

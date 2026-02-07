@@ -13,14 +13,6 @@ struct LiveActivityView: View {
         context.state
     }
     
-    private var isWork: Bool {
-        state.isWorkPhase
-    }
-    
-    private var phaseColor: Color {
-        isWork ? .orange : .green
-    }
-    
     var body: some View {
         HStack(spacing: 16) {
             // 左侧：阶段指示
@@ -29,7 +21,7 @@ struct LiveActivityView: View {
                 Text(state.statusText)
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(state.isPaused ? .yellow : phaseColor)
+                    .foregroundStyle(state.isPaused ? .yellow : state.phaseColor)
                 
                 // 大倒计时 - 使用 timerInterval 实现系统级精确倒计时
                 if state.isPaused {
@@ -66,8 +58,8 @@ struct LiveActivityView: View {
                         .stroke(.white.opacity(0.2), lineWidth: 3)
                     
                     Circle()
-                        .trim(from: 0, to: setProgress)
-                        .stroke(phaseColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .trim(from: 0, to: state.setProgressValue)
+                        .stroke(state.phaseColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                     
                     VStack(spacing: 0) {
@@ -89,14 +81,7 @@ struct LiveActivityView: View {
             }
         }
         .padding(16)
-        .activityBackgroundTint(isWork ? .black : Color(red: 0.05, green: 0.2, blue: 0.05))
-    }
-    
-    // MARK: - Computed
-    
-    private var setProgress: Double {
-        guard state.totalSets > 0 else { return 0 }
-        return Double(state.currentSet) / Double(state.totalSets)
+        .activityBackgroundTint(state.isWorkPhase ? .black : Color(red: 0.05, green: 0.2, blue: 0.05))
     }
 }
 

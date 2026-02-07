@@ -88,84 +88,6 @@ struct TimerDisplay: View {
     }
 }
 
-// MARK: - Compact Timer Display
-
-/// 紧凑型计时器显示（用于导航栏或小组件）
-struct CompactTimerDisplay: View {
-    let formattedTime: String
-    let phase: TimerPhase
-    let isPaused: Bool
-    
-    var body: some View {
-        HStack(spacing: 8) {
-            // 阶段指示点
-            Circle()
-                .fill(phase == .work ? Color.orange : Color.green)
-                .frame(width: 8, height: 8)
-            
-            // 时间
-            Text(formattedTime)
-                .font(.headline.monospacedDigit())
-                .foregroundStyle(isPaused ? .secondary : .primary)
-            
-            // 暂停指示
-            if isPaused {
-                Image(systemName: "pause.fill")
-                    .font(.caption)
-                    .foregroundStyle(.yellow)
-            }
-        }
-    }
-}
-
-// MARK: - Progress Ring
-
-/// 进度环组件
-struct ProgressRing: View {
-    let progress: Double
-    let phase: TimerPhase
-    let lineWidth: CGFloat
-    
-    init(progress: Double, phase: TimerPhase, lineWidth: CGFloat = 12) {
-        self.progress = progress
-        self.phase = phase
-        self.lineWidth = lineWidth
-    }
-    
-    var body: some View {
-        ZStack {
-            // 背景环
-            Circle()
-                .stroke(
-                    Color.progressBackground,
-                    lineWidth: lineWidth
-                )
-            
-            // 进度环
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    ringColor,
-                    style: StrokeStyle(
-                        lineWidth: lineWidth,
-                        lineCap: .round
-                    )
-                )
-                .rotationEffect(.degrees(-90))
-                .animation(.linear(duration: 0.1), value: progress)
-        }
-    }
-    
-    private var ringColor: Color {
-        switch phase {
-        case .work:
-            return .orange
-        case .rest:
-            return .green
-        }
-    }
-}
-
 // MARK: - Preview
 
 #Preview("Timer Display - Work") {
@@ -214,15 +136,4 @@ struct ProgressRing: View {
             phase: .work
         )
     }
-}
-
-#Preview("Progress Ring") {
-    HStack(spacing: 20) {
-        ProgressRing(progress: 0.3, phase: .work)
-            .frame(width: 100, height: 100)
-        
-        ProgressRing(progress: 0.7, phase: .rest)
-            .frame(width: 100, height: 100)
-    }
-    .padding()
 }

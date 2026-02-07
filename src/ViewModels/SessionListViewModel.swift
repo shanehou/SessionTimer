@@ -3,7 +3,6 @@
 
 import Foundation
 import SwiftData
-import SwiftUI
 
 /// Session 列表 ViewModel
 @Observable
@@ -71,9 +70,7 @@ final class SessionListViewModel {
     /// 切换收藏状态
     /// - Parameter session: 要切换的 Session
     func toggleFavorite(_ session: Session) {
-        withAnimation {
-            session.isFavorite.toggle()
-        }
+        session.isFavorite.toggle()
     }
     
     /// 请求删除 Session（显示确认对话框）
@@ -86,10 +83,9 @@ final class SessionListViewModel {
     /// 确认删除 Session
     func confirmDelete() {
         guard let session = sessionToDelete else { return }
-        withAnimation {
-            modelContext.delete(session)
-        }
+        modelContext.delete(session)
         sessionToDelete = nil
+        showDeleteConfirmation = false
     }
     
     /// 取消删除
@@ -101,9 +97,7 @@ final class SessionListViewModel {
     /// 直接删除 Session（无确认）
     /// - Parameter session: 要删除的 Session
     func delete(_ session: Session) {
-        withAnimation {
-            modelContext.delete(session)
-        }
+        modelContext.delete(session)
     }
 }
 

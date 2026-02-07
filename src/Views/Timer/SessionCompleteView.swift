@@ -14,7 +14,6 @@ struct SessionCompleteView: View {
     
     @State private var showCheckmark: Bool = false
     @State private var showContent: Bool = false
-    @State private var confettiCounter: Int = 0
     
     // MARK: - Body
     
@@ -61,7 +60,7 @@ struct SessionCompleteView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.white)
-                        .cornerRadius(16)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
                 .padding(.horizontal, 32)
                 .opacity(showContent ? 1 : 0)
@@ -132,7 +131,7 @@ struct SessionCompleteView: View {
             }
             .padding()
             .background(Color.white.opacity(0.1))
-            .cornerRadius(16)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
     
@@ -153,67 +152,6 @@ struct SessionCompleteView: View {
                 .foregroundStyle(.white.opacity(0.7))
         }
         .frame(minWidth: 80)
-    }
-}
-
-// MARK: - Celebration Effect
-
-/// 庆祝效果视图（可选的动画效果）
-struct CelebrationEffect: View {
-    @State private var particles: [Particle] = []
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                ForEach(particles) { particle in
-                    Circle()
-                        .fill(particle.color)
-                        .frame(width: particle.size, height: particle.size)
-                        .position(particle.position)
-                        .opacity(particle.opacity)
-                }
-            }
-            .onAppear {
-                createParticles(in: geometry.size)
-            }
-        }
-        .allowsHitTesting(false)
-    }
-    
-    private func createParticles(in size: CGSize) {
-        let colors: [Color] = [.green, .yellow, .orange, .blue, .purple, .pink]
-        
-        for i in 0..<50 {
-            let particle = Particle(
-                id: i,
-                position: CGPoint(x: size.width / 2, y: size.height / 2),
-                color: colors.randomElement()!,
-                size: CGFloat.random(in: 4...12),
-                opacity: 1.0
-            )
-            particles.append(particle)
-        }
-        
-        // 动画粒子
-        withAnimation(.easeOut(duration: 1.5)) {
-            for i in particles.indices {
-                let angle = Double.random(in: 0...2 * .pi)
-                let distance = CGFloat.random(in: 100...300)
-                particles[i].position = CGPoint(
-                    x: size.width / 2 + cos(angle) * distance,
-                    y: size.height / 2 + sin(angle) * distance
-                )
-                particles[i].opacity = 0
-            }
-        }
-    }
-    
-    struct Particle: Identifiable {
-        let id: Int
-        var position: CGPoint
-        let color: Color
-        let size: CGFloat
-        var opacity: Double
     }
 }
 

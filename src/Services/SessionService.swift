@@ -4,47 +4,9 @@
 import Foundation
 import SwiftData
 
-/// Session 管理服务协议
+/// Session 管理服务
 @MainActor
-protocol SessionServiceProtocol {
-    // MARK: - Session CRUD
-    
-    /// 创建新 Session
-    func createSession(name: String, blocks: [Block]) throws -> Session
-    
-    /// 获取所有 Session
-    func getAllSessions() -> [Session]
-    
-    /// 根据 ID 获取 Session
-    func getSession(by id: UUID) -> Session?
-    
-    /// 更新 Session
-    func updateSession(_ session: Session) throws
-    
-    /// 删除 Session
-    func deleteSession(_ session: Session)
-    
-    /// 更新 Session 最近使用时间
-    func markAsUsed(_ session: Session)
-    
-    /// 切换 Session 收藏状态
-    func toggleFavorite(_ session: Session)
-    
-    // MARK: - Block Operations
-    
-    /// 添加 Block 到 Session
-    func addBlock(_ block: Block, to session: Session)
-    
-    /// 从 Session 移除 Block
-    func removeBlock(_ block: Block, from session: Session)
-    
-    /// 重新排序 Session 中的 Block
-    func reorderBlocks(in session: Session, from fromIndex: Int, to toIndex: Int)
-}
-
-/// Session 管理服务实现
-@MainActor
-final class SessionService: SessionServiceProtocol {
+final class SessionService {
     // MARK: - Properties
     
     private let modelContext: ModelContext
@@ -121,7 +83,9 @@ final class SessionService: SessionServiceProtocol {
                 return s1.createdAt > s2.createdAt
             }
         } catch {
+            #if DEBUG
             print("Error fetching sessions: \(error)")
+            #endif
             return []
         }
     }
@@ -141,7 +105,9 @@ final class SessionService: SessionServiceProtocol {
             let sessions = try modelContext.fetch(descriptor)
             return sessions.first
         } catch {
+            #if DEBUG
             print("Error fetching session by ID: \(error)")
+            #endif
             return nil
         }
     }

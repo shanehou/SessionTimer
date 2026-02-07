@@ -25,9 +25,6 @@ final class Session {
     /// 是否收藏，收藏的 Session 显示在列表顶部
     var isFavorite: Bool
     
-    /// 手动排序顺序
-    var sortOrder: Int
-    
     /// 包含的 Block 列表（级联删除）
     @Relationship(deleteRule: .cascade, inverse: \Block.session)
     var blocks: [Block]
@@ -66,7 +63,6 @@ final class Session {
         self.createdAt = Date()
         self.lastUsedAt = nil
         self.isFavorite = false
-        self.sortOrder = 0
         self.blocks = blocks
     }
     
@@ -111,12 +107,17 @@ extension Session {
         totalDuration.formattedDuration
     }
     
-    /// 格式化的创建时间
-    var formattedCreatedAt: String {
+    /// 日期格式化器（静态缓存，避免重复创建）
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
-        return formatter.string(from: createdAt)
+        return formatter
+    }()
+    
+    /// 格式化的创建时间
+    var formattedCreatedAt: String {
+        Self.dateFormatter.string(from: createdAt)
     }
     
     /// 格式化的最近使用时间
@@ -169,5 +170,17 @@ extension Session {
     /// 标记为已使用
     func markAsUsed() {
         lastUsedAt = Date()
+    }
+}
+
+// MARK: - Hashable
+
+extension Session: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Session, rhs: Session) -> Bool {
+        lhs.id == rhs.id
     }
 }

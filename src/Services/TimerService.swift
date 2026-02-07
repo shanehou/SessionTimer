@@ -4,47 +4,9 @@
 import Foundation
 import Combine
 
-/// 计时器服务协议
+/// 计时器服务
 @MainActor
-protocol TimerServiceProtocol: AnyObject {
-    /// 当前计时状态
-    var currentState: TimerState? { get }
-    
-    /// 当前运行的 Session
-    var currentSession: Session? { get }
-    
-    // MARK: - Timer Control
-    
-    /// 启动 Session 计时
-    func start(session: Session)
-    
-    /// 暂停计时
-    func pause()
-    
-    /// 继续计时
-    func resume()
-    
-    /// 停止并重置计时器
-    func stop()
-    
-    /// 跳过当前阶段
-    func skip()
-    
-    // MARK: - Runtime Adjustments
-    
-    /// 为当前 Block 加一组
-    func addSet()
-    
-    /// 跳过当前休息时间
-    func skipRest()
-    
-    /// 延长当前休息时间
-    func extendRest(by seconds: Int)
-}
-
-/// 计时器服务实现
-@MainActor
-final class TimerService: TimerServiceProtocol, ObservableObject {
+final class TimerService: ObservableObject {
     // MARK: - Published Properties
     
     /// 当前计时状态
@@ -123,9 +85,13 @@ final class TimerService: TimerServiceProtocol, ObservableObject {
     
     /// 暂停计时
     func pause() {
+        #if DEBUG
         print("[TimerService] pause() called, currentState.isPaused=\(currentState?.isPaused ?? true)")
+        #endif
         guard var state = currentState else {
+            #if DEBUG
             print("[TimerService] pause() - no currentState, returning")
+            #endif
             return
         }
         
@@ -136,14 +102,20 @@ final class TimerService: TimerServiceProtocol, ObservableObject {
         
         onEvent?(.paused)
         onStateChanged?(state)
+        #if DEBUG
         print("[TimerService] pause() done, state.isPaused=\(state.isPaused)")
+        #endif
     }
     
     /// 继续计时
     func resume() {
+        #if DEBUG
         print("[TimerService] resume() called, currentState.isPaused=\(currentState?.isPaused ?? false)")
+        #endif
         guard var state = currentState else {
+            #if DEBUG
             print("[TimerService] resume() - no currentState, returning")
+            #endif
             return
         }
         
@@ -154,7 +126,9 @@ final class TimerService: TimerServiceProtocol, ObservableObject {
         
         onEvent?(.resumed)
         onStateChanged?(state)
+        #if DEBUG
         print("[TimerService] resume() done, state.isPaused=\(state.isPaused)")
+        #endif
     }
     
     /// 停止并重置计时器

@@ -196,6 +196,24 @@
 
 ---
 
+## Phase 9: Code Quality & Refactoring
+
+**Purpose**: 去除冗余废弃代码，优化不符合最佳实践的设计
+
+- [X] R01 删除死代码：CompactDurationPicker, CompactSessionCard, CompactTimerDisplay, ProgressRing, CelebrationEffect, confettiCounter, Block.copy(), 未使用的主题色, formatted_MSS, ContentState.initial()
+- [X] R02 替换废弃 API：.cornerRadius → .clipShape, .navigationBarTrailing → .topBarTrailing, .navigationBarHidden → .toolbar(.hidden)
+- [X] R03 修复 Bug：SessionEditorView alert 中的 VStack, confirmDelete 未重置 showDeleteConfirmation, 错误的 emptySessionName 错误类型
+- [X] R04 移除不必要的单一实现 Protocol 抽象 (AudioServiceProtocol, HapticServiceProtocol, ScreenServiceProtocol, SessionServiceProtocol, TimerServiceProtocol, NotificationServiceProtocol)
+- [X] R05 移动 Session:Hashable 从 ContentView 到 Model 文件, 移除未使用的 sortOrder 属性
+- [X] R06 替换 print() 为 #if DEBUG 包裹（22 处）
+- [X] R07 清理主题色：移除未使用的 favoriteColor, progressForeground, accent(for:), diWorkCompact, diRestCompact
+- [X] R08 修复 TimerViewModel 中 backgroundColor 冗余分支、blockProgressText 使用 sortedBlocks、移除冗余 .receive(on:)
+- [X] R09 提取 Widget 视图中重复的 isWork/phaseColor/setProgress 到 SessionTimerAttributes.ContentState 共享扩展
+- [X] R10 清理 TimerEngine 调试代码 (engineId, timerCreationCount, 13处 print, cleanup/reset/isPaused 死代码)
+- [X] R11 其他优化：移除 TimerState.startedAt/pausedAt/isRunning 未使用属性, showValidationError 改为 computed, Array safe subscript 移到 Extensions, 移除 ViewModel 中 withAnimation, DateFormatter 缓存
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

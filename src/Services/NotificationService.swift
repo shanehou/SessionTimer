@@ -5,31 +5,9 @@ import Foundation
 import ActivityKit
 import UserNotifications
 
-/// 通知服务协议
+/// 通知与 Live Activity 服务
 @MainActor
-protocol NotificationServiceProtocol {
-    /// 请求通知权限
-    func requestPermission() async -> Bool
-    
-    /// 启动 Live Activity
-    func startLiveActivity(for session: Session, state: TimerState) async
-    
-    /// 更新 Live Activity
-    func updateLiveActivity(state: TimerState, session: Session) async
-    
-    /// 结束 Live Activity
-    func endLiveActivity() async
-    
-    /// 发送阶段切换通知 (后台时)
-    func sendPhaseChangeNotification(phase: TimerPhase, blockName: String)
-    
-    /// 发送 Session 完成通知 (后台时)
-    func sendSessionCompleteNotification(sessionName: String)
-}
-
-/// 通知服务实现
-@MainActor
-final class NotificationService: NotificationServiceProtocol {
+final class NotificationService {
     // MARK: - Properties
     
     /// 当前 Live Activity ID
@@ -52,7 +30,9 @@ final class NotificationService: NotificationServiceProtocol {
             hasNotificationPermission = granted
             return granted
         } catch {
+            #if DEBUG
             print("[NotificationService] Failed to request permission: \(error)")
+            #endif
             return false
         }
     }
@@ -65,7 +45,9 @@ final class NotificationService: NotificationServiceProtocol {
         await endLiveActivity()
         
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            #if DEBUG
             print("[NotificationService] Live Activities not enabled")
+            #endif
             return
         }
         
@@ -91,9 +73,13 @@ final class NotificationService: NotificationServiceProtocol {
                 pushType: nil
             )
             currentActivityId = activity.id
+            #if DEBUG
             print("[NotificationService] Live Activity started: \(activity.id)")
+            #endif
         } catch {
+            #if DEBUG
             print("[NotificationService] Failed to start Live Activity: \(error)")
+            #endif
         }
     }
     
@@ -131,7 +117,9 @@ final class NotificationService: NotificationServiceProtocol {
         
         await activity.end(content, dismissalPolicy: .default)
         currentActivityId = nil
+        #if DEBUG
         print("[NotificationService] Live Activity ended")
+        #endif
     }
     
     // MARK: - Local Notifications
@@ -162,7 +150,9 @@ final class NotificationService: NotificationServiceProtocol {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
+                #if DEBUG
                 print("[NotificationService] Failed to send phase change notification: \(error)")
+                #endif
             }
         }
     }
@@ -185,7 +175,9 @@ final class NotificationService: NotificationServiceProtocol {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
+                #if DEBUG
                 print("[NotificationService] Failed to send session complete notification: \(error)")
+                #endif
             }
         }
     }

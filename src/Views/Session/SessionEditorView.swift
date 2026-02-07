@@ -71,12 +71,10 @@ struct SessionEditorView: View {
                     viewModel.clearValidationError()
                 }
             } message: { error in
-                VStack {
+                if let suggestion = error.recoverySuggestion {
+                    Text("\(error.localizedDescription)\n\(suggestion)")
+                } else {
                     Text(error.localizedDescription)
-                    if let suggestion = error.recoverySuggestion {
-                        Text(suggestion)
-                            .font(.caption)
-                    }
                 }
             }
         }

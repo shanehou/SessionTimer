@@ -71,48 +71,6 @@ struct SessionCard: View {
     }
 }
 
-// MARK: - Compact Session Card
-
-/// 紧凑型 Session 卡片（用于详情页的相关 Session 推荐等）
-struct CompactSessionCard: View {
-    let session: Session
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        if session.isFavorite {
-                            Image(systemName: "star.fill")
-                                .font(.caption2)
-                                .foregroundStyle(.yellow)
-                        }
-                        Text(session.name)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                    }
-                    
-                    Text(session.formattedTotalDuration)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(10)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 // MARK: - Preview
 
 #Preview("Session Card") {
@@ -129,15 +87,4 @@ struct CompactSessionCard: View {
         )
     }
     .listStyle(.plain)
-}
-
-#Preview("Compact Session Card") {
-    let block = Block(name: "深蹲", setCount: 3, workDuration: 30, restDuration: 10)
-    let session = Session(name: "练腿日", blocks: [block])
-    session.isFavorite = true
-    
-    return VStack {
-        CompactSessionCard(session: session, onTap: { print("Tapped") })
-    }
-    .padding()
 }

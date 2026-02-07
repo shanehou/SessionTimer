@@ -44,7 +44,7 @@ struct SessionListView: View {
             prompt: "搜索练习计划"
         )
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showSessionEditor = true
                 } label: {

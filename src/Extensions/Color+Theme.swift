@@ -25,14 +25,8 @@ extension Color {
     
     // MARK: - UI Element Colors
     
-    /// 收藏标记颜色
-    static let favoriteColor = Color.yellow
-    
     /// 进度条背景色
     static let progressBackground = Color.white.opacity(0.3)
-    
-    /// 进度条前景色
-    static let progressForeground = Color.white
     
     // MARK: - Helper Methods
     
@@ -48,25 +42,4 @@ extension Color {
         }
     }
     
-    /// 根据计时阶段返回对应的强调颜色
-    /// - Parameter phase: 计时器阶段
-    /// - Returns: 对应的强调颜色
-    static func accent(for phase: TimerPhase) -> Color {
-        switch phase {
-        case .work:
-            return .orange
-        case .rest:
-            return .mint
-        }
-    }
-}
-
-// MARK: - Dynamic Island & Live Activity Colors
-
-extension Color {
-    /// Dynamic Island 紧凑模式下的 Work 颜色
-    static let diWorkCompact = Color.orange
-    
-    /// Dynamic Island 紧凑模式下的 Rest 颜色
-    static let diRestCompact = Color.green
 }

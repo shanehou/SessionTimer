@@ -77,10 +77,7 @@ final class TimerViewModel {
     
     /// 背景颜色 (Work: 黑色, Rest: 绿色)
     var backgroundColor: Color {
-        if isPaused {
-            return currentPhase == .work ? .workBackground : .restBackground
-        }
-        return Color.background(for: currentPhase)
+        Color.background(for: currentPhase)
     }
     
     /// 状态文本 ("WORK" / "REST" / "PAUSED")
@@ -108,7 +105,7 @@ final class TimerViewModel {
     
     /// Block 进度文本 (e.g., "1/4")
     var blockProgressText: String {
-        "\(currentBlockIndex + 1)/\(session.blocks.count)"
+        "\(currentBlockIndex + 1)/\(session.sortedBlocks.count)"
     }
     
     // MARK: - Initializer
@@ -143,7 +140,6 @@ final class TimerViewModel {
         // 这比回调更可靠，因为新订阅会自动获取当前值
         
         timerService.$currentState
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 guard let self = self, let state = state else { return }
                 self.updateFromState(state)
@@ -151,7 +147,6 @@ final class TimerViewModel {
             .store(in: &cancellables)
         
         timerService.$isCompleted
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] completed in
                 guard let self = self else { return }
                 if completed {
@@ -389,14 +384,6 @@ final class TimerViewModel {
         default:
             break
         }
-    }
-}
-
-// MARK: - Array Safe Subscript
-
-extension Array {
-    subscript(safe index: Index) -> Element? {
-        indices.contains(index) ? self[index] : nil
     }
 }
 

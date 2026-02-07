@@ -11,21 +11,17 @@ import WidgetKit
 struct DynamicIslandCompactLeadingView: View {
     let context: ActivityViewContext<SessionTimerAttributes>
     
-    private var isWork: Bool {
-        context.state.isWorkPhase
-    }
-    
     var body: some View {
         HStack(spacing: 4) {
             // 阶段颜色圆点
             Circle()
-                .fill(isWork ? Color.orange : Color.green)
+                .fill(context.state.phaseColor)
                 .frame(width: 8, height: 8)
             
             // 阶段文字
-            Text(context.state.isPaused ? "⏸" : (isWork ? "W" : "R"))
+            Text(context.state.isPaused ? "⏸" : (context.state.isWorkPhase ? "W" : "R"))
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundStyle(isWork ? .orange : .green)
+                .foregroundStyle(context.state.phaseColor)
         }
     }
 }
@@ -57,10 +53,6 @@ struct DynamicIslandCompactTrailingView: View {
 struct DynamicIslandMinimalView: View {
     let context: ActivityViewContext<SessionTimerAttributes>
     
-    private var isWork: Bool {
-        context.state.isWorkPhase
-    }
-    
     var body: some View {
         ZStack {
             // 进度环
@@ -68,23 +60,18 @@ struct DynamicIslandMinimalView: View {
                 .stroke(.white.opacity(0.2), lineWidth: 2)
             
             Circle()
-                .trim(from: 0, to: setProgress)
+                .trim(from: 0, to: context.state.setProgressValue)
                 .stroke(
-                    isWork ? Color.orange : Color.green,
+                    context.state.phaseColor,
                     style: StrokeStyle(lineWidth: 2, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
             
             // 中心阶段指示
-            Text(context.state.isPaused ? "⏸" : (isWork ? "W" : "R"))
+            Text(context.state.isPaused ? "⏸" : (context.state.isWorkPhase ? "W" : "R"))
                 .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(isWork ? .orange : .green)
+                .foregroundStyle(context.state.phaseColor)
         }
-    }
-    
-    private var setProgress: Double {
-        guard context.state.totalSets > 0 else { return 0 }
-        return Double(context.state.currentSet) / Double(context.state.totalSets)
     }
 }
 
@@ -94,20 +81,12 @@ struct DynamicIslandMinimalView: View {
 struct DynamicIslandExpandedLeadingView: View {
     let context: ActivityViewContext<SessionTimerAttributes>
     
-    private var isWork: Bool {
-        context.state.isWorkPhase
-    }
-    
-    private var phaseColor: Color {
-        isWork ? .orange : .green
-    }
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(context.state.statusText)
                 .font(.caption2)
                 .fontWeight(.bold)
-                .foregroundStyle(context.state.isPaused ? .yellow : phaseColor)
+                .foregroundStyle(context.state.isPaused ? .yellow : context.state.phaseColor)
             
             Text(context.state.currentBlockName)
                 .font(.caption)
@@ -163,14 +142,6 @@ struct DynamicIslandExpandedCenterView: View {
 struct DynamicIslandExpandedBottomView: View {
     let context: ActivityViewContext<SessionTimerAttributes>
     
-    private var isWork: Bool {
-        context.state.isWorkPhase
-    }
-    
-    private var phaseColor: Color {
-        isWork ? .orange : .green
-    }
-    
     var body: some View {
         VStack(spacing: 6) {
             // 组进度条
@@ -182,8 +153,8 @@ struct DynamicIslandExpandedBottomView: View {
                     
                     // 前景
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(phaseColor)
-                        .frame(width: geometry.size.width * setProgress)
+                        .fill(context.state.phaseColor)
+                        .frame(width: geometry.size.width * context.state.setProgressValue)
                 }
             }
             .frame(height: 4)
@@ -194,10 +165,5 @@ struct DynamicIslandExpandedBottomView: View {
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
         }
-    }
-    
-    private var setProgress: Double {
-        guard context.state.totalSets > 0 else { return 0 }
-        return Double(context.state.currentSet) / Double(context.state.totalSets)
     }
 }

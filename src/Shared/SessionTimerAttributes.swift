@@ -4,6 +4,7 @@
 
 import ActivityKit
 import Foundation
+import SwiftUI
 
 /// Live Activities 和 Dynamic Island 的数据结构
 struct SessionTimerAttributes: ActivityAttributes {
@@ -51,6 +52,16 @@ struct SessionTimerAttributes: ActivityAttributes {
             phase == "work"
         }
         
+        /// 阶段对应的颜色
+        var phaseColor: Color {
+            isWorkPhase ? .orange : .green
+        }
+        
+        /// 组进度 (0.0 - 1.0)
+        var setProgressValue: Double {
+            Double(currentSet) / Double(max(totalSets, 1))
+        }
+        
         /// 格式化的剩余时间 "MM:SS"
         var formattedTime: String {
             let minutes = remainingSeconds / 60
@@ -90,24 +101,6 @@ struct SessionTimerAttributes: ActivityAttributes {
         }
         
         // MARK: - Static Factory Methods
-        
-        /// 创建初始状态
-        static func initial(
-            blockName: String,
-            totalSets: Int,
-            workDuration: Int
-        ) -> ContentState {
-            ContentState(
-                currentBlockName: blockName,
-                currentBlockIndex: 0,
-                currentSet: 1,
-                totalSets: totalSets,
-                remainingSeconds: workDuration,
-                timerEndDate: Date().addingTimeInterval(TimeInterval(workDuration)),
-                phase: "work",
-                isPaused: false
-            )
-        }
         
         /// 创建完成状态
         static func completed() -> ContentState {
