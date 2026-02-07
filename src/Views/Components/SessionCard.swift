@@ -56,12 +56,18 @@ struct SessionCard: View {
                     .foregroundStyle(.green)
             }
             .buttonStyle(.plain)
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel("开始\(session.name)")
+            .accessibilityHint("立即开始此练习计划")
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
         .onTapGesture {
             onTap()
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(session.name)，\(session.summary)\(session.isFavorite ? "，已收藏" : "")")
+        .accessibilityHint("点击查看详情")
     }
 }
 

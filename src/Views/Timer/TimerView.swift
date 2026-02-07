@@ -103,6 +103,13 @@ struct TimerView: View {
                 viewModel.stop()
             }
         }
+        // T064: App lifecycle handling
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            viewModel.handleDidEnterBackground()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            viewModel.handleWillEnterForeground()
+        }
         .confirmationDialog(
             "确定要结束练习吗？",
             isPresented: $showStopConfirmation,
@@ -135,6 +142,9 @@ struct TimerView: View {
                     .font(.title2)
                     .foregroundStyle(Color.textSecondary)
             }
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel("结束练习")
+            .accessibilityHint("长按确认结束当前练习")
             
             Spacer()
             
@@ -148,6 +158,8 @@ struct TimerView: View {
                     .font(.caption)
                     .foregroundStyle(Color.textSecondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(viewModel.session.name)，第\(viewModel.blockProgressText)个练习项目")
             
             Spacer()
             
@@ -159,6 +171,9 @@ struct TimerView: View {
                     .font(.title2)
                     .foregroundStyle(Color.textSecondary)
             }
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel("调整选项")
+            .accessibilityHint("打开运行时调整面板，可以加组、跳过休息或延长休息")
         }
     }
     
@@ -174,6 +189,8 @@ struct TimerView: View {
                 .foregroundStyle(Color.textSecondary.opacity(0.6))
         }
         .opacity(viewModel.isPaused ? 1.0 : 0.5)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("操作提示：单击暂停或继续，双击跳过当前阶段，长按结束练习，上滑打开更多选项")
     }
     
     // MARK: - Gesture Handlers
@@ -214,6 +231,7 @@ struct AdjustmentSheet: View {
                 } label: {
                     Label("加一组", systemImage: "plus.circle")
                 }
+                .accessibilityHint("为当前练习项目增加一组")
                 
                 // 跳过休息（仅在休息阶段可用）
                 if viewModel.currentPhase == .rest {
@@ -223,6 +241,7 @@ struct AdjustmentSheet: View {
                     } label: {
                         Label("跳过休息", systemImage: "forward.fill")
                     }
+                    .accessibilityHint("立即跳过当前休息，开始下一组练习")
                     
                     Button {
                         viewModel.extendRest()
@@ -230,6 +249,7 @@ struct AdjustmentSheet: View {
                     } label: {
                         Label("延长休息 30 秒", systemImage: "clock.badge.plus")
                     }
+                    .accessibilityHint("将当前休息时间延长30秒")
                 }
                 
                 // 跳过当前阶段
@@ -239,6 +259,7 @@ struct AdjustmentSheet: View {
                 } label: {
                     Label("跳过当前阶段", systemImage: "forward.end")
                 }
+                .accessibilityHint("跳过当前练习或休息阶段")
             }
             .navigationTitle("调整")
             .navigationBarTitleDisplayMode(.inline)

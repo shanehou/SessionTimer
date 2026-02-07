@@ -48,6 +48,15 @@ final class TimerViewModel {
     private let hapticService: HapticService
     private let audioService: AudioService
     private let screenService: ScreenService
+    private let notificationService: NotificationService
+    
+    // MARK: - Live Activity Update Throttle
+    
+    /// 上次更新 Live Activity 的时间（避免过于频繁更新）
+    private var lastLiveActivityUpdate: Date = .distantPast
+    
+    /// Live Activity 最小更新间隔（秒）
+    private let liveActivityUpdateInterval: TimeInterval = 1.0
     
     // MARK: - Subscriptions
     
@@ -109,13 +118,15 @@ final class TimerViewModel {
         timerService: TimerService = .shared,
         hapticService: HapticService = .shared,
         audioService: AudioService = .shared,
-        screenService: ScreenService = .shared
+        screenService: ScreenService = .shared,
+        notificationService: NotificationService = .shared
     ) {
         self.session = session
         self.timerService = timerService
         self.hapticService = hapticService
         self.audioService = audioService
         self.screenService = screenService
+        self.notificationService = notificationService
         
         // 初始化状态
         if let firstBlock = session.sortedBlocks.first {
@@ -183,8 +194,20 @@ final class TimerViewModel {
         audioService.preloadSounds()
         screenService.onSessionStart()
         
+        // 启动后台音频保活
+        audioService.startBackgroundAudioSession()
+        
         // 启动计时
         timerService.start(session: session)
+        
+        // 请求通知权限并启动 Live Activity
+        Task {
+            _ = await notificationService.requestPermission()
+            
+            if let state = timerService.currentState {
+                await notificationService.startLiveActivity(for: session, state: state)
+            }
+        }
         
         // 标记 Session 为已使用
         session.markAsUsed()
@@ -204,6 +227,14 @@ final class TimerViewModel {
         }
         
         hapticService.playPauseResume()
+        
+        // 暂停/恢复时立即更新 Live Activity
+        if let state = timerService.currentState {
+            lastLiveActivityUpdate = Date()
+            Task {
+                await notificationService.updateLiveActivity(state: state, session: session)
+            }
+        }
     }
     
     /// 暂停
@@ -234,6 +265,13 @@ final class TimerViewModel {
     func stop() {
         timerService.stop()
         screenService.onSessionEnd()
+        audioService.endBackgroundAudioSession()
+        
+        // 结束 Live Activity
+        Task {
+            await notificationService.endLiveActivity()
+        }
+        
         isStarted = false
         isCompleted = false
     }
@@ -263,6 +301,15 @@ final class TimerViewModel {
         currentPhase = state.currentPhase
         remainingSeconds = state.remainingSeconds
         isPaused = state.isPaused
+        
+        // 节流更新 Live Activity（每秒最多一次）
+        let now = Date()
+        if now.timeIntervalSince(lastLiveActivityUpdate) >= liveActivityUpdateInterval {
+            lastLiveActivityUpdate = now
+            Task {
+                await notificationService.updateLiveActivity(state: state, session: session)
+            }
+        }
     }
     
     /// 处理阶段切换
@@ -282,6 +329,18 @@ final class TimerViewModel {
         
         // 播放触觉反馈
         hapticService.playPhaseTransition()
+        
+        // 阶段切换时立即更新 Live Activity（不受节流限制）
+        if let state = timerService.currentState {
+            lastLiveActivityUpdate = Date()
+            Task {
+                await notificationService.updateLiveActivity(state: state, session: session)
+            }
+        }
+        
+        // 后台时发送阶段切换通知 (T059)
+        let blockName = session.sortedBlocks[safe: blockIndex]?.name ?? ""
+        notificationService.sendPhaseChangeNotification(phase: phase, blockName: blockName)
     }
     
     /// 处理 Session 完成
@@ -295,6 +354,15 @@ final class TimerViewModel {
         
         // 重置屏幕状态
         screenService.onSessionEnd()
+        
+        // 结束后台音频
+        audioService.endBackgroundAudioSession()
+        
+        // 结束 Live Activity 并发送完成通知
+        Task {
+            await notificationService.endLiveActivity()
+        }
+        notificationService.sendSessionCompleteNotification(sessionName: session.name)
     }
     
     /// 处理计时器事件
@@ -329,6 +397,44 @@ final class TimerViewModel {
 extension Array {
     subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+// MARK: - Background / Foreground Handling
+
+extension TimerViewModel {
+    /// App 进入后台时调用
+    func handleDidEnterBackground() {
+        notificationService.isInBackground = true
+        
+        // 立即更新 Live Activity，确保后台同步
+        if let state = timerService.currentState {
+            Task {
+                await notificationService.updateLiveActivity(state: state, session: session)
+            }
+        }
+    }
+    
+    /// App 回到前台时调用 - 重新同步状态 (T058)
+    func handleWillEnterForeground() {
+        notificationService.isInBackground = false
+        
+        // 从 TimerService 同步最新状态
+        // TimerEngine 基于 CADisplayLink + CACurrentMediaTime 会自动处理后台时间差
+        // 这里只需要确保 ViewModel 状态与 TimerService 同步
+        if let state = timerService.currentState {
+            updateFromState(state)
+            
+            // 更新 Live Activity
+            Task {
+                await notificationService.updateLiveActivity(state: state, session: session)
+            }
+        }
+        
+        // 如果计时器已完成（在后台完成的）
+        if timerService.isCompleted && !isCompleted {
+            handleSessionComplete()
+        }
     }
 }
 

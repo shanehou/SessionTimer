@@ -1,39 +1,47 @@
-// Placeholder for SessionTimerWidgets - will be implemented in Phase 7 (User Story 5)
+// T054: SessionTimerWidgets - Widget Bundle Entry Point
+// Session Timer - Widget Extension 入口
+
 import WidgetKit
 import SwiftUI
 
 @main
 struct SessionTimerWidgetBundle: WidgetBundle {
     var body: some Widget {
-        SessionTimerLiveActivity()
+        SessionTimerLiveActivityWidget()
     }
 }
 
-struct SessionTimerLiveActivity: Widget {
+/// Live Activity Widget 配置
+struct SessionTimerLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "SessionTimerWidget", provider: Provider()) { _ in
-            Text("Session Timer Widget")
+        ActivityConfiguration(for: SessionTimerAttributes.self) { context in
+            // Lock Screen / Banner UI
+            LiveActivityView(context: context)
+        } dynamicIsland: { context in
+            DynamicIsland {
+                // Expanded Region
+                DynamicIslandExpandedRegion(.leading) {
+                    DynamicIslandExpandedLeadingView(context: context)
+                }
+                
+                DynamicIslandExpandedRegion(.trailing) {
+                    DynamicIslandExpandedTrailingView(context: context)
+                }
+                
+                DynamicIslandExpandedRegion(.bottom) {
+                    DynamicIslandExpandedBottomView(context: context)
+                }
+                
+                DynamicIslandExpandedRegion(.center) {
+                    DynamicIslandExpandedCenterView(context: context)
+                }
+            } compactLeading: {
+                DynamicIslandCompactLeadingView(context: context)
+            } compactTrailing: {
+                DynamicIslandCompactTrailingView(context: context)
+            } minimal: {
+                DynamicIslandMinimalView(context: context)
+            }
         }
-        .configurationDisplayName("Session Timer")
-        .description("Track your practice sessions")
     }
-}
-
-struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date())
-    }
-    
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
-        completion(SimpleEntry(date: Date()))
-    }
-    
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
-        let timeline = Timeline(entries: [SimpleEntry(date: Date())], policy: .never)
-        completion(timeline)
-    }
-}
-
-struct SimpleEntry: TimelineEntry {
-    let date: Date
 }

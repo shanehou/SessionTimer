@@ -117,6 +117,8 @@ struct SessionEditorView: View {
             } label: {
                 Label("添加练习项目", systemImage: "plus.circle.fill")
             }
+            .frame(minHeight: 44)
+            .accessibilityHint("添加一个新的练习项目到当前计划")
         } header: {
             HStack {
                 Text("练习项目")

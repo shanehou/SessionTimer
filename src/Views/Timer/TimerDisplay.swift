@@ -27,6 +27,7 @@ struct TimerDisplay: View {
                 .font(.title2)
                 .fontWeight(.medium)
                 .foregroundStyle(Color.textPrimary)
+                .accessibilityLabel("当前练习：\(blockName)")
             
             // 大号倒计时
             countdownDisplay
@@ -35,7 +36,10 @@ struct TimerDisplay: View {
             Text("第 \(setProgress) 组")
                 .font(.title3)
                 .foregroundStyle(Color.textSecondary)
+                .accessibilityLabel("第\(setProgress)组")
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(statusText)，\(blockName)，剩余\(formattedTime)，第\(setProgress)组")
     }
     
     // MARK: - Subviews
@@ -59,7 +63,7 @@ struct TimerDisplay: View {
     /// 倒计时显示
     private var countdownDisplay: some View {
         Text(formattedTime)
-            .font(.system(size: 120, weight: .bold, design: .monospaced))
+            .font(.system(size: 128, weight: .bold, design: .monospaced))
             .foregroundStyle(Color.textPrimary)
             .minimumScaleFactor(0.5)
             .lineLimit(1)

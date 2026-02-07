@@ -65,6 +65,9 @@ struct SessionCompleteView: View {
                 }
                 .padding(.horizontal, 32)
                 .opacity(showContent ? 1 : 0)
+                .frame(minHeight: 56)
+                .accessibilityLabel("完成")
+                .accessibilityHint("返回主界面")
             }
             .padding()
         }

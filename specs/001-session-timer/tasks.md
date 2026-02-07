@@ -162,21 +162,21 @@
 
 ### Services for User Story 5
 
-- [ ] T051 [US5] Create `src/Services/NotificationService.swift` implementing NotificationServiceProtocol: requestPermission, startLiveActivity, updateLiveActivity, endLiveActivity, sendPhaseChangeNotification, sendSessionCompleteNotification
-- [ ] T052 [US5] Configure AVAudioSession for background audio in AudioService - enable app to run in background
+- [X] T051 [US5] Create `src/Services/NotificationService.swift` implementing NotificationServiceProtocol: requestPermission, startLiveActivity, updateLiveActivity, endLiveActivity, sendPhaseChangeNotification, sendSessionCompleteNotification
+- [X] T052 [US5] Configure AVAudioSession for background audio in AudioService - enable app to run in background
 
 ### Widget Extension for User Story 5
 
-- [ ] T053 [P] [US5] Create `src-widgets/Info.plist` for Widget Extension
-- [ ] T054 [US5] Create `src-widgets/SessionTimerWidgets.swift` - Widget bundle entry point
-- [ ] T055 [US5] Create `src-widgets/LiveActivityView.swift` - Lock Screen Live Activity UI showing current Block, set count, remaining time, phase (Work/Rest colors)
-- [ ] T056 [US5] Create `src-widgets/DynamicIslandView.swift` - Dynamic Island views (compact, minimal, expanded) with countdown pie chart, set progress
+- [X] T053 [P] [US5] Create `src-widgets/Info.plist` for Widget Extension
+- [X] T054 [US5] Create `src-widgets/SessionTimerWidgets.swift` - Widget bundle entry point
+- [X] T055 [US5] Create `src-widgets/LiveActivityView.swift` - Lock Screen Live Activity UI showing current Block, set count, remaining time, phase (Work/Rest colors)
+- [X] T056 [US5] Create `src-widgets/DynamicIslandView.swift` - Dynamic Island views (compact, minimal, expanded) with countdown pie chart, set progress
 
 ### Integration for User Story 5
 
-- [ ] T057 [US5] Wire TimerService to NotificationService - start/update/end Live Activity on timer events
-- [ ] T058 [US5] Implement background state restoration - recalculate timer state from elapsed time when app returns to foreground
-- [ ] T059 [US5] Send Time Sensitive notifications on phase change when app is in background
+- [X] T057 [US5] Wire TimerService to NotificationService - start/update/end Live Activity on timer events
+- [X] T058 [US5] Implement background state restoration - recalculate timer state from elapsed time when app returns to foreground
+- [X] T059 [US5] Send Time Sensitive notifications on phase change when app is in background
 
 **Checkpoint**: User Story 5 complete - Full background operation with Lock Screen and Dynamic Island support
 
@@ -186,13 +186,13 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T060 [P] Implement runtime adjustments in TimerService: addSet(), skipRest(), extendRest(by:) per FR-008
-- [ ] T061 [P] Add runtime adjustment UI to TimerView (swipe up for options sheet: +1 set, skip rest, extend rest)
-- [ ] T062 Implement countdown warning feedback (last 3 seconds) - HapticService.playCountdownWarning + AudioService.playCountdown
-- [ ] T063 [P] Add accessibility labels to all interactive elements for VoiceOver support
-- [ ] T064 [P] Add App lifecycle handling in SessionTimerApp - handle scenePhase changes, pause timer on background if needed
-- [ ] T065 Run quickstart.md validation - verify all build commands work (make generate, make build, make run-simulator)
-- [ ] T066 Final UI polish - ensure 44pt minimum touch targets, 2m legibility for timer digits, Work/Rest color contrast
+- [X] T060 [P] Implement runtime adjustments in TimerService: addSet(), skipRest(), extendRest(by:) per FR-008
+- [X] T061 [P] Add runtime adjustment UI to TimerView (swipe up for options sheet: +1 set, skip rest, extend rest)
+- [X] T062 Implement countdown warning feedback (last 3 seconds) - HapticService.playCountdownWarning + AudioService.playCountdown
+- [X] T063 [P] Add accessibility labels to all interactive elements for VoiceOver support
+- [X] T064 [P] Add App lifecycle handling in SessionTimerApp - handle scenePhase changes, pause timer on background if needed
+- [X] T065 Run quickstart.md validation - verify all build commands work (make generate, make build, make run-simulator)
+- [X] T066 Final UI polish - ensure 44pt minimum touch targets, 2m legibility for timer digits, Work/Rest color contrast
 
 ---
 

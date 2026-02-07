@@ -31,8 +31,12 @@ struct SessionTimerAttributes: ActivityAttributes {
         /// 当前 Block 总组数
         let totalSets: Int
         
-        /// 剩余秒数
+        /// 剩余秒数 (用于暂停状态下的静态显示)
         let remainingSeconds: Int
+        
+        /// 计时器结束时间 (用于非暂停状态下的实时倒计时)
+        /// 当 isPaused == false 时，Widget 使用此日期配合 Text(timerInterval:) 实现独立于 App 的精确倒计时
+        let timerEndDate: Date
         
         /// 当前阶段 ("work" or "rest")
         let phase: String
@@ -52,6 +56,19 @@ struct SessionTimerAttributes: ActivityAttributes {
             let minutes = remainingSeconds / 60
             let seconds = remainingSeconds % 60
             return String(format: "%02d:%02d", minutes, seconds)
+        }
+        
+        /// 计时器区间（从现在到结束时间）
+        /// 用于 Text(timerInterval:) 实现系统级精确倒计时
+        var timerInterval: ClosedRange<Date> {
+            let now = Date()
+            if isPaused {
+                // 暂停时显示静态值：创建一个固定的区间
+                let start = now
+                let end = now.addingTimeInterval(TimeInterval(remainingSeconds))
+                return start...end
+            }
+            return now...timerEndDate
         }
         
         /// 组进度文本 (e.g., "2/3")
@@ -86,6 +103,7 @@ struct SessionTimerAttributes: ActivityAttributes {
                 currentSet: 1,
                 totalSets: totalSets,
                 remainingSeconds: workDuration,
+                timerEndDate: Date().addingTimeInterval(TimeInterval(workDuration)),
                 phase: "work",
                 isPaused: false
             )
@@ -93,12 +111,14 @@ struct SessionTimerAttributes: ActivityAttributes {
         
         /// 创建完成状态
         static func completed() -> ContentState {
-            ContentState(
+            let now = Date()
+            return ContentState(
                 currentBlockName: "完成",
                 currentBlockIndex: 0,
                 currentSet: 0,
                 totalSets: 0,
                 remainingSeconds: 0,
+                timerEndDate: now,
                 phase: "work",
                 isPaused: false
             )

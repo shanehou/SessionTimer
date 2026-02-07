@@ -101,6 +101,8 @@ struct SessionDetailView: View {
             .tint(.green)
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
             .listRowBackground(Color.clear)
+            .accessibilityLabel("开始练习\(session.name)")
+            .accessibilityHint("启动计时器开始此练习计划")
         }
     }
     
@@ -130,6 +132,8 @@ struct SessionDetailView: View {
                 )
                 .foregroundStyle(session.isFavorite ? .yellow : .primary)
             }
+            .accessibilityLabel(session.isFavorite ? "取消收藏" : "添加到收藏")
+            .accessibilityHint(session.isFavorite ? "将此练习计划从收藏中移除" : "将此练习计划添加到收藏")
             
             // 删除按钮
             Button(role: .destructive) {
@@ -137,6 +141,8 @@ struct SessionDetailView: View {
             } label: {
                 Label("删除练习计划", systemImage: "trash")
             }
+            .accessibilityLabel("删除练习计划")
+            .accessibilityHint("永久删除此练习计划，此操作不可撤销")
         } header: {
             Text("操作")
         } footer: {
@@ -183,6 +189,8 @@ private struct StatCard: View {
         .padding(.vertical, 12)
         .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title)：\(value)")
     }
 }
 
@@ -217,6 +225,8 @@ private struct BlockDetailRow: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(block.name)，\(block.setCount)组，练习\(block.workDuration.formatted_MMSS)，休息\(block.restDuration.formatted_MMSS)，共\(block.formattedTotalDuration)")
     }
 }
 

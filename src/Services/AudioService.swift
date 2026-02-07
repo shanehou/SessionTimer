@@ -182,18 +182,45 @@ extension AudioService {
 // MARK: - Background Audio Support
 
 extension AudioService {
+    /// 静音音频播放器 - 保持 App 在后台运行
+    private static var silentPlayer: AVAudioPlayer?
+    
     /// 开始后台音频会话（用于保持 App 在后台运行）
+    /// 通过播放静音音频保持后台活跃
     func startBackgroundAudioSession() {
         configureAudioSession()
+        
+        // 创建一个极低音量的音频循环来保持后台运行
+        if AudioService.silentPlayer == nil {
+            // 使用已有的音频文件，设置极低音量
+            if let url = Bundle.main.url(forResource: "countdown", withExtension: "wav") {
+                do {
+                    let player = try AVAudioPlayer(contentsOf: url)
+                    player.numberOfLoops = -1  // 无限循环
+                    player.volume = 0.01       // 极低音量（几乎无声）
+                    player.prepareToPlay()
+                    AudioService.silentPlayer = player
+                } catch {
+                    print("[AudioService] Failed to create silent player: \(error)")
+                }
+            }
+        }
+        
+        AudioService.silentPlayer?.play()
+        print("[AudioService] Background audio session started")
     }
     
     /// 结束后台音频会话
     func endBackgroundAudioSession() {
+        AudioService.silentPlayer?.stop()
+        AudioService.silentPlayer = nil
+        
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             isSessionConfigured = false
         } catch {
-            print("Failed to deactivate audio session: \(error)")
+            print("[AudioService] Failed to deactivate audio session: \(error)")
         }
+        print("[AudioService] Background audio session ended")
     }
 }

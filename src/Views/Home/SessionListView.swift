@@ -50,6 +50,8 @@ struct SessionListView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel("新建练习计划")
+                .accessibilityHint("创建一个新的练习计划")
             }
         }
         .sheet(isPresented: $showSessionEditor) {

@@ -89,11 +89,15 @@ struct BlockEditorRow: View {
             }
             .buttonStyle(.plain)
             .disabled(block.setCount <= 1)
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel("减少组数")
+            .accessibilityHint("当前\(block.setCount)组")
             
             // 组数显示
             Text("\(block.setCount)")
                 .font(.title3.monospacedDigit())
                 .frame(minWidth: 40)
+                .accessibilityLabel("\(block.setCount)组")
             
             // 增加按钮
             Button {
@@ -106,6 +110,9 @@ struct BlockEditorRow: View {
             }
             .buttonStyle(.plain)
             .disabled(block.setCount >= 99)
+            .frame(minWidth: 44, minHeight: 44)
+            .accessibilityLabel("增加组数")
+            .accessibilityHint("当前\(block.setCount)组")
         }
     }
     
