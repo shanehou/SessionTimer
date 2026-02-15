@@ -39,6 +39,9 @@ final class TimerService: ObservableObject {
     
     /// 倒计时警告阈值（秒）
     private let countdownWarningThreshold = 3
+
+    /// 进入后台时的时间戳（用于后台恢复时计算经过的时间）
+    private var backgroundEntryDate: Date?
     
     // MARK: - Initializer
     
@@ -134,14 +137,15 @@ final class TimerService: ObservableObject {
     /// 停止并重置计时器
     func stop() {
         engine.stop()
-        
+
         if currentState != nil {
             onEvent?(.stopped)
         }
-        
+
         currentState = nil
         currentSession = nil
         isCompleted = false
+        backgroundEntryDate = nil
     }
     
     /// 跳过当前阶段
@@ -263,42 +267,96 @@ extension TimerService {
     var currentBlock: Block? {
         guard let session = currentSession,
               let state = currentState else { return nil }
-        
+
         let sortedBlocks = session.sortedBlocks
         guard state.currentBlockIndex < sortedBlocks.count else { return nil }
         return sortedBlocks[state.currentBlockIndex]
     }
-    
+
     /// 当前阶段
     var currentPhase: TimerPhase {
         currentState?.currentPhase ?? .work
     }
-    
+
     /// 当前组号 (1-based)
     var currentSet: Int {
         currentState?.currentSet ?? 1
     }
-    
+
     /// 剩余秒数
     var remainingSeconds: Int {
         currentState?.remainingSeconds ?? 0
     }
-    
+
     /// 是否暂停
     var isPaused: Bool {
         currentState?.isPaused ?? false
     }
-    
+
     /// 是否正在运行
     var isRunning: Bool {
         currentState != nil && !isCompleted
     }
-    
+
     /// 总进度 (0.0 - 1.0)
     var progress: Double {
         guard let session = currentSession,
               let state = currentState else { return 0.0 }
         return state.progress(in: session)
+    }
+}
+
+// MARK: - Background Recovery
+
+extension TimerService {
+    /// 记录进入后台的时间
+    func recordBackgroundEntry() {
+        backgroundEntryDate = Date()
+    }
+
+    /// 从后台恢复，基于墙钟时间快进计时状态
+    /// - Returns: 是否发生了阶段切换
+    @discardableResult
+    func recoverFromBackground() -> Bool {
+        guard let entryDate = backgroundEntryDate,
+              let state = currentState,
+              let session = currentSession,
+              !state.isPaused else {
+            backgroundEntryDate = nil
+            return false
+        }
+
+        let elapsedSeconds = Int(Date().timeIntervalSince(entryDate))
+        backgroundEntryDate = nil
+
+        guard elapsedSeconds > 0 else { return false }
+
+        let result = state.advancing(by: elapsedSeconds, in: session)
+
+        if result.isCompleted {
+            // Session 在后台期间完成
+            currentState = TimerState(session: session) // 保持非 nil 以触发完成流程
+            engine.stop()
+            isCompleted = true
+            onEvent?(.sessionCompleted(sessionId: session.id))
+            onSessionCompleted?(session)
+            return true
+        }
+
+        if let finalState = result.finalState {
+            currentState = finalState
+            onStateChanged?(finalState)
+
+            // 通知所有阶段切换
+            for (phase, blockIndex, set) in result.phaseTransitions {
+                onPhaseChanged?(phase, blockIndex, set)
+                onEvent?(.phaseChanged(phase: phase, blockIndex: blockIndex, set: set))
+            }
+
+            return !result.phaseTransitions.isEmpty
+        }
+
+        return false
     }
 }
 

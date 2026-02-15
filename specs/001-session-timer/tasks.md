@@ -214,6 +214,24 @@
 
 ---
 
+## Phase 10: Bug Fixes - 通知与同步
+
+**Purpose**: 修复关闭App时通知不自动消失、App/灵动岛/通知/AOD 状态不一致的问题
+
+- [X] B01 NotificationService: 添加 `removeAllNotifications()` 方法清除所有已送达和待送达通知；在 `startLiveActivity`、`endLiveActivity` 中调用
+- [X] B02 TimerState: 添加 `advancing(by:in:)` 方法，支持基于墙钟时间快进任意秒数，正确处理所有阶段切换
+- [X] B03 TimerService: 添加 `recordBackgroundEntry()` / `recoverFromBackground()` 方法，基于进入后台的墙钟时间精确恢复计时状态
+- [X] B04 NotificationService: 添加 `scheduleUpcomingPhaseNotifications(from:session:)` 方法，进入后台时预调度所有未来阶段切换通知；添加 `cancelScheduledPhaseNotifications()` 方法回到前台时取消
+- [X] B05 NotificationService: `updateLiveActivity` 设置 `staleDate` 为当前阶段结束时间，让系统知道数据何时过期
+- [X] B06 TimerViewModel: 更新 `handleDidEnterBackground()` 调用 `recordBackgroundEntry()`、预调度通知、立即更新 Live Activity
+- [X] B07 TimerViewModel: 更新 `handleWillEnterForeground()` 调用 `recoverFromBackground()`、取消预调度通知、清除已送达通知、强制同步所有状态
+- [X] B08 SessionTimerApp: 在 `handleScenePhaseChange` 中同步调用后台进入/恢复逻辑、预调度/取消通知
+- [X] B09 TimerViewModel: `stop()` 和 `handleSessionComplete()` 中添加 `cancelScheduledPhaseNotifications()` 调用
+
+**Checkpoint**: 通知不再重复，App/灵动岛/锁屏/AOD 计时完全一致
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

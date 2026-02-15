@@ -261,12 +261,13 @@ final class TimerViewModel {
         timerService.stop()
         screenService.onSessionEnd()
         audioService.endBackgroundAudioSession()
-        
-        // 结束 Live Activity
+
+        // 结束 Live Activity 并清除所有通知
         Task {
             await notificationService.endLiveActivity()
         }
-        
+        notificationService.cancelScheduledPhaseNotifications()
+
         isStarted = false
         isCompleted = false
     }
@@ -342,17 +343,20 @@ final class TimerViewModel {
     private func handleSessionComplete() {
         isCompleted = true
         isPaused = false
-        
+
         // 播放完成反馈
         audioService.playSessionComplete()
         hapticService.playSessionComplete()
-        
+
         // 重置屏幕状态
         screenService.onSessionEnd()
-        
+
         // 结束后台音频
         audioService.endBackgroundAudioSession()
-        
+
+        // 取消预调度的通知
+        notificationService.cancelScheduledPhaseNotifications()
+
         // 结束 Live Activity 并发送完成通知
         Task {
             await notificationService.endLiveActivity()
@@ -393,34 +397,60 @@ extension TimerViewModel {
     /// App 进入后台时调用
     func handleDidEnterBackground() {
         notificationService.isInBackground = true
-        
+
+        // 记录后台进入时间，用于前台恢复时精确快进
+        timerService.recordBackgroundEntry()
+
         // 立即更新 Live Activity，确保后台同步
         if let state = timerService.currentState {
+            lastLiveActivityUpdate = Date()
             Task {
                 await notificationService.updateLiveActivity(state: state, session: session)
             }
         }
+
+        // 预调度后台阶段切换通知
+        if let state = timerService.currentState {
+            notificationService.scheduleUpcomingPhaseNotifications(from: state, session: session)
+        }
     }
-    
+
     /// App 回到前台时调用 - 重新同步状态 (T058)
     func handleWillEnterForeground() {
         notificationService.isInBackground = false
-        
+
+        // 取消预调度的通知（前台时由 app 实时触发）
+        notificationService.cancelScheduledPhaseNotifications()
+
+        // 清除后台期间送达的通知
+        notificationService.removeAllNotifications()
+
+        // 基于墙钟时间恢复计时状态（处理后台期间的阶段切换）
+        let hadTransitions = timerService.recoverFromBackground()
+
+        // 如果计时器已完成（在后台完成的）
+        if timerService.isCompleted && !isCompleted {
+            handleSessionComplete()
+            return
+        }
+
         // 从 TimerService 同步最新状态
-        // TimerEngine 基于 CADisplayLink + CACurrentMediaTime 会自动处理后台时间差
-        // 这里只需要确保 ViewModel 状态与 TimerService 同步
         if let state = timerService.currentState {
             updateFromState(state)
-            
-            // 更新 Live Activity
+
+            // 立即更新 Live Activity
+            lastLiveActivityUpdate = Date()
             Task {
                 await notificationService.updateLiveActivity(state: state, session: session)
             }
         }
-        
-        // 如果计时器已完成（在后台完成的）
-        if timerService.isCompleted && !isCompleted {
-            handleSessionComplete()
+
+        // 如果发生了阶段切换，恢复屏幕状态
+        if hadTransitions, let state = timerService.currentState {
+            let sortedBlocks = session.sortedBlocks
+            if let block = sortedBlocks[safe: state.currentBlockIndex] {
+                screenService.updateScreenState(for: state.currentPhase, restDuration: block.restDuration)
+            }
         }
     }
 }

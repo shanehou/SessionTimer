@@ -58,7 +58,10 @@ struct SessionTimerApp: App {
         case .background:
             // App 进入后台 - 通知 NotificationService
             NotificationService.shared.isInBackground = true
-            
+
+            // 记录后台进入时间
+            TimerService.shared.recordBackgroundEntry()
+
             // 如果有活跃计时器，确保 Live Activity 是最新的
             if let state = TimerService.shared.currentState,
                let session = TimerService.shared.currentSession {
@@ -68,15 +71,27 @@ struct SessionTimerApp: App {
                         session: session
                     )
                 }
+
+                // 预调度后台阶段切换通知
+                NotificationService.shared.scheduleUpcomingPhaseNotifications(
+                    from: state,
+                    session: session
+                )
             }
-            
-            // 确保屏幕恢复正常（避免后台时 idle timer 仍被禁用）
-            // 注意：后台时 iOS 会自动处理，但前台恢复时需要重新设置
-            
+
         case .active:
             // App 回到前台 - 同步状态
             NotificationService.shared.isInBackground = false
-            
+
+            // 取消预调度的通知
+            NotificationService.shared.cancelScheduledPhaseNotifications()
+
+            // 清除后台期间送达的通知
+            NotificationService.shared.removeAllNotifications()
+
+            // 基于墙钟时间恢复计时状态
+            TimerService.shared.recoverFromBackground()
+
             // 重新同步 Live Activity
             if let state = TimerService.shared.currentState,
                let session = TimerService.shared.currentSession {
@@ -86,15 +101,15 @@ struct SessionTimerApp: App {
                         session: session
                     )
                 }
-                
+
                 // 恢复屏幕常亮状态
                 ScreenService.shared.updateScreenState(for: state, in: session)
             }
-            
+
         case .inactive:
             // 即将进入后台或从后台恢复的过渡状态
             break
-            
+
         @unknown default:
             break
         }

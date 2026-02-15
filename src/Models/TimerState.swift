@@ -194,6 +194,57 @@ extension TimerState {
     }
 }
 
+// MARK: - Background Recovery
+
+extension TimerState {
+    /// 快进结果
+    struct AdvanceResult: Sendable {
+        /// 最终状态（nil 表示 Session 已完成）
+        let finalState: TimerState?
+        /// 期间发生的阶段切换列表 (phase, blockIndex, set)
+        let phaseTransitions: [(TimerPhase, Int, Int)]
+        /// Session 是否已完成
+        var isCompleted: Bool { finalState == nil }
+    }
+
+    /// 快进指定秒数，正确处理所有阶段切换
+    /// - Parameters:
+    ///   - seconds: 要快进的秒数
+    ///   - session: 当前 Session
+    /// - Returns: 快进结果，包含最终状态和期间的阶段切换
+    func advancing(by seconds: Int, in session: Session) -> AdvanceResult {
+        guard seconds > 0, !isPaused else {
+            return AdvanceResult(finalState: self, phaseTransitions: [])
+        }
+
+        var remaining = seconds
+        var state = self
+        var transitions: [(TimerPhase, Int, Int)] = []
+
+        while remaining > 0 {
+            if remaining < state.remainingSeconds {
+                // 当前阶段还没结束
+                state.remainingSeconds -= remaining
+                remaining = 0
+            } else {
+                // 当前阶段结束，消耗剩余秒数后切换
+                remaining -= state.remainingSeconds
+                state.remainingSeconds = 0
+
+                if let nextState = state.nextPhase(in: session) {
+                    state = nextState
+                    transitions.append((state.currentPhase, state.currentBlockIndex, state.currentSet))
+                } else {
+                    // Session 完成
+                    return AdvanceResult(finalState: nil, phaseTransitions: transitions)
+                }
+            }
+        }
+
+        return AdvanceResult(finalState: state, phaseTransitions: transitions)
+    }
+}
+
 // MARK: - Debug Description
 
 extension TimerState: CustomDebugStringConvertible {
