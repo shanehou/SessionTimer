@@ -1,0 +1,29 @@
+# SessionTimer Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-03-04
+
+## Active Technologies
+
+- Swift 6.0, Strict Concurrency: complete + SwiftUI, SwiftData, AVFoundation (`AVSpeechSynthesizer`), NaturalLanguage (`NLLanguageRecognizer`) (002-voice-announcements)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+# Add commands for Swift 6.0, Strict Concurrency: complete
+
+## Code Style
+
+Swift 6.0, Strict Concurrency: complete: Follow standard conventions
+
+## Recent Changes
+
+- 002-voice-announcements: Added Swift 6.0, Strict Concurrency: complete + SwiftUI, SwiftData, AVFoundation (`AVSpeechSynthesizer`), NaturalLanguage (`NLLanguageRecognizer`)
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
