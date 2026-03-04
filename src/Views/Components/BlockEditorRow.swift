@@ -50,6 +50,11 @@ struct BlockEditorRow: View {
                     
                     // 休息时间设置
                     restDurationRow
+                    
+                    Divider()
+                    
+                    // 语音播报设置
+                    announcementSection
                 }
                 .padding(.top, 4)
             }
@@ -145,6 +150,51 @@ struct BlockEditorRow: View {
                 seconds: $block.restDuration,
                 label: "休息时间"
             )
+        }
+    }
+    
+    /// 语音播报设置区域
+    @State private var isAnnouncementExpanded: Bool = false
+    
+    private var announcementSection: some View {
+        DisclosureGroup("语音播报", isExpanded: $isAnnouncementExpanded) {
+            VStack(spacing: 12) {
+                announcementField(
+                    title: "开始播报",
+                    text: $block.announcementStart,
+                    placeholder: "默认：\(block.name)"
+                )
+                
+                announcementField(
+                    title: "休息播报",
+                    text: $block.announcementRest,
+                    placeholder: "默认：休息"
+                )
+                
+                announcementField(
+                    title: "继续播报",
+                    text: $block.announcementContinue,
+                    placeholder: "默认：继续"
+                )
+            }
+            .padding(.top, 8)
+        }
+        .font(.subheadline)
+    }
+    
+    private func announcementField(title: String, text: Binding<String>, placeholder: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            TextField(placeholder, text: text)
+                .font(.subheadline)
+                .textFieldStyle(.roundedBorder)
+            if text.wrappedValue.count > 50 {
+                Text("建议文本不超过 50 个字符")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            }
         }
     }
 }

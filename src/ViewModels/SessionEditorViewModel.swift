@@ -14,19 +14,28 @@ final class EditableBlock: Identifiable {
     var setCount: Int
     var workDuration: Int  // seconds
     var restDuration: Int  // seconds
+    var announcementStart: String
+    var announcementRest: String
+    var announcementContinue: String
     
     init(
         id: UUID = UUID(),
         name: String = "新练习",
         setCount: Int = 3,
         workDuration: Int = 30,
-        restDuration: Int = 10
+        restDuration: Int = 10,
+        announcementStart: String = "",
+        announcementRest: String = "",
+        announcementContinue: String = ""
     ) {
         self.id = id
         self.name = name
         self.setCount = setCount
         self.workDuration = workDuration
         self.restDuration = restDuration
+        self.announcementStart = announcementStart
+        self.announcementRest = announcementRest
+        self.announcementContinue = announcementContinue
     }
     
     /// 从 Block 模型创建
@@ -36,19 +45,26 @@ final class EditableBlock: Identifiable {
             name: block.name,
             setCount: block.setCount,
             workDuration: block.workDuration,
-            restDuration: block.restDuration
+            restDuration: block.restDuration,
+            announcementStart: block.announcementStart ?? "",
+            announcementRest: block.announcementRest ?? "",
+            announcementContinue: block.announcementContinue ?? ""
         )
     }
     
     /// 转换为 Block 模型
     func toBlock(orderIndex: Int) -> Block {
-        Block(
+        let block = Block(
             name: name,
             setCount: setCount,
             workDuration: workDuration,
             restDuration: restDuration,
             orderIndex: orderIndex
         )
+        block.announcementStart = announcementStart.isEmpty ? nil : announcementStart
+        block.announcementRest = announcementRest.isEmpty ? nil : announcementRest
+        block.announcementContinue = announcementContinue.isEmpty ? nil : announcementContinue
+        return block
     }
     
     /// 单组时长
@@ -70,6 +86,9 @@ final class SessionEditorViewModel {
     
     /// Session 名称
     var name: String = ""
+    
+    /// Session 完成播报文本
+    var announcementComplete: String = ""
     
     /// Block 列表
     var blocks: [EditableBlock] = []
@@ -134,6 +153,7 @@ final class SessionEditorViewModel {
         self.isEditing = true
         self.editingSessionId = session.id
         self.name = session.name
+        self.announcementComplete = session.announcementComplete ?? ""
         self.blocks = session.sortedBlocks.map { EditableBlock(from: $0) }
     }
     
@@ -245,8 +265,9 @@ final class SessionEditorViewModel {
                 throw ValidationError.sessionNotFound
             }
             
-            // 更新名称
+            // 更新名称和播报文本
             session.name = trimmedName
+            session.announcementComplete = announcementComplete.isEmpty ? nil : announcementComplete
             
             // 删除旧的 Blocks
             for block in session.blocks {
@@ -268,6 +289,7 @@ final class SessionEditorViewModel {
             }
             
             let session = Session(name: trimmedName, blocks: newBlocks)
+            session.announcementComplete = announcementComplete.isEmpty ? nil : announcementComplete
             modelContext.insert(session)
             
             return session

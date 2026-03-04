@@ -43,6 +43,9 @@ struct SessionEditorView: View {
                 // Block 列表
                 blocksSection
                 
+                // 语音播报
+                announcementSection
+                
                 // 摘要信息
                 summarySection
             }
@@ -126,6 +129,24 @@ struct SessionEditorView: View {
             }
         } footer: {
             Text("每个练习项目可以设置组数、练习时间和休息时间")
+        }
+    }
+    
+    /// 语音播报区
+    private var announcementSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 4) {
+                TextField("默认：训练完成", text: $viewModel.announcementComplete)
+                if viewModel.announcementComplete.count > 50 {
+                    Text("建议文本不超过 50 个字符")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
+            }
+        } header: {
+            Text("语音播报")
+        } footer: {
+            Text("训练完成时的播报文本，留空则使用默认值")
         }
     }
     

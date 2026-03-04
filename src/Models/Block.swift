@@ -31,6 +31,17 @@ final class Block {
     /// 所属 Session (inverse relationship)
     var session: Session?
     
+    // MARK: - Voice Announcement Properties
+    
+    /// Block 首组 Work 开始时的播报文本，nil 或空字符串时回退到 name
+    var announcementStart: String?
+    
+    /// Rest 阶段开始时的播报文本，nil 或空字符串时回退到"休息"
+    var announcementRest: String?
+    
+    /// 非首组 Work 开始时的播报文本，nil 或空字符串时回退到"继续"
+    var announcementContinue: String?
+    
     // MARK: - Computed Properties
     
     /// 单个 Block 总时长（秒）

@@ -49,6 +49,12 @@ final class TimerViewModel {
     private let audioService: AudioService
     private let screenService: ScreenService
     private let notificationService: NotificationService
+    private let speechService = SpeechService.shared
+    
+    // MARK: - Voice Announcement
+    
+    @ObservationIgnored
+    @AppStorage("isVoiceAnnouncementEnabled") private var isVoiceAnnouncementEnabled: Bool = true
     
     // MARK: - Live Activity Update Throttle
     
@@ -288,6 +294,29 @@ final class TimerViewModel {
         timerService.skipRest()
     }
     
+    // MARK: - Voice Announcement Resolution
+    
+    /// 根据阶段、Block、组号解析播报文本
+    private func resolveAnnouncementText(phase: TimerPhase, block: Block, set: Int) -> String {
+        switch phase {
+        case .work where set == 1:
+            let text = block.announcementStart ?? ""
+            return text.isEmpty ? block.name : text
+        case .work:
+            let text = block.announcementContinue ?? ""
+            return text.isEmpty ? "继续" : text
+        case .rest:
+            let text = block.announcementRest ?? ""
+            return text.isEmpty ? "休息" : text
+        }
+    }
+    
+    /// 解析 Session 完成播报文本
+    private func resolveCompletionText(session: Session) -> String {
+        let text = session.announcementComplete ?? ""
+        return text.isEmpty ? "训练完成" : text
+    }
+    
     // MARK: - Private Methods
     
     /// 从 TimerState 更新 ViewModel 状态
@@ -315,12 +344,17 @@ final class TimerViewModel {
             screenService.updateScreenState(for: phase, restDuration: block.restDuration)
         }
         
-        // 播放音效
-        switch phase {
-        case .work:
-            audioService.playWorkStart()
-        case .rest:
-            audioService.playRestStart()
+        // 语音播报或音效（互斥）
+        if isVoiceAnnouncementEnabled, let block = session.sortedBlocks[safe: blockIndex] {
+            let text = resolveAnnouncementText(phase: phase, block: block, set: set)
+            speechService.speak(text)
+        } else {
+            switch phase {
+            case .work:
+                audioService.playWorkStart()
+            case .rest:
+                audioService.playRestStart()
+            }
         }
         
         // 播放触觉反馈
@@ -344,8 +378,13 @@ final class TimerViewModel {
         isCompleted = true
         isPaused = false
 
-        // 播放完成反馈
-        audioService.playSessionComplete()
+        // 完成播报或音效（互斥）
+        if isVoiceAnnouncementEnabled {
+            let text = resolveCompletionText(session: session)
+            speechService.speak(text)
+        } else {
+            audioService.playSessionComplete()
+        }
         hapticService.playSessionComplete()
 
         // 重置屏幕状态

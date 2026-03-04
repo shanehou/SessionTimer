@@ -29,17 +29,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T001 [P] Add `announcementStart: String?`, `announcementRest: String?`, `announcementContinue: String?` properties to Block model in `src/Models/Block.swift`
+- [X] T001 [P] Add `announcementStart: String?`, `announcementRest: String?`, `announcementContinue: String?` properties to Block model in `src/Models/Block.swift`
   - Add three optional String properties after existing properties
   - SwiftData auto-migration handles existing data (nil defaults)
   - Reference: `specs/002-voice-announcements/data-model.md` § Block
 
-- [ ] T002 [P] Add `announcementComplete: String?` property to Session model in `src/Models/Session.swift`
+- [X] T002 [P] Add `announcementComplete: String?` property to Session model in `src/Models/Session.swift`
   - Add one optional String property after existing properties
   - SwiftData auto-migration handles existing data (nil defaults)
   - Reference: `specs/002-voice-announcements/data-model.md` § Session
 
-- [ ] T003 [P] Create SpeechService with AVSpeechSynthesizer and NLLanguageRecognizer in `src/Services/SpeechService.swift`
+- [X] T003 [P] Create SpeechService with AVSpeechSynthesizer and NLLanguageRecognizer in `src/Services/SpeechService.swift`
   - `@MainActor final class SpeechService` with `static let shared`
   - Hold `AVSpeechSynthesizer` instance
   - `speak(_ text: String)`: guard empty → `stopSpeaking(.immediate)` → detect language → create utterance with matched voice → `speak(utterance)`
@@ -51,7 +51,7 @@
   - No separate AVAudioSession config needed (reuses AudioService's existing session)
   - Reference: `specs/002-voice-announcements/contracts/speech-service.md`, `specs/002-voice-announcements/research.md` § Task 1, 2, 6
 
-- [ ] T004 Run `make generate` to register new `SpeechService.swift` in Xcode project
+- [X] T004 Run `make generate` to register new `SpeechService.swift` in Xcode project
   - `src/Services/` is already in project.yml sources, so `xcodegen generate` picks up the new file automatically
   - Verify compilation succeeds with `make build`
 
@@ -67,7 +67,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Add speechService property, @AppStorage flag, and announcement text resolution method to TimerViewModel in `src/ViewModels/TimerViewModel.swift`
+- [X] T005 [US1] Add speechService property, @AppStorage flag, and announcement text resolution method to TimerViewModel in `src/ViewModels/TimerViewModel.swift`
   - Add `private let speechService = SpeechService.shared`
   - Add `@AppStorage("isVoiceAnnouncementEnabled") private var isVoiceAnnouncementEnabled: Bool = true`
   - Add `resolveAnnouncementText(phase: TimerPhase, block: Block, set: Int) -> String`:
@@ -78,7 +78,7 @@
     - `session.announcementComplete?.isEmpty == false ? session.announcementComplete! : "训练完成"`
   - Reference: `specs/002-voice-announcements/contracts/speech-service.md` § Integration Contract
 
-- [ ] T006 [US1] Modify `handlePhaseChange()` to conditionally use SpeechService instead of Work/Rest start sounds in `src/ViewModels/TimerViewModel.swift`
+- [X] T006 [US1] Modify `handlePhaseChange()` to conditionally use SpeechService instead of Work/Rest start sounds in `src/ViewModels/TimerViewModel.swift`
   - In `handlePhaseChange(phase:blockIndex:set:)`, replace the existing `switch phase` audio block:
     - When `isVoiceAnnouncementEnabled`: resolve text via `resolveAnnouncementText()` → call `speechService.speak(text)`
     - When disabled: keep original `audioService.playWorkStart()` / `audioService.playRestStart()`
@@ -86,13 +86,13 @@
   - Countdown sounds remain unconditional (handled separately in `handleEvent`)
   - Reference: `specs/002-voice-announcements/research.md` § Task 4, spec FR-010
 
-- [ ] T007 [US1] Modify `handleSessionComplete()` to conditionally use SpeechService for completion announcement in `src/ViewModels/TimerViewModel.swift`
+- [X] T007 [US1] Modify `handleSessionComplete()` to conditionally use SpeechService for completion announcement in `src/ViewModels/TimerViewModel.swift`
   - When `isVoiceAnnouncementEnabled`: resolve text via `resolveCompletionText()` → call `speechService.speak(text)` instead of `audioService.playSessionComplete()`
   - When disabled: keep original `audioService.playSessionComplete()`
   - Haptic feedback remains unconditional
   - Reference: spec FR-004, FR-010
 
-- [ ] T008 [US1] Build and verify default voice announcements on device by running `make generate && make run-device`
+- [X] T008 [US1] Build and verify default voice announcements on device by running `make generate && make run-device`
   - Create a Session with 2+ Blocks, each with 2+ sets
   - Verify: Block 首组 Work → Block 名称, Rest → "休息", 后续组 Work → "继续", Session 完成 → "训练完成"
   - Verify: 倒计时音效 (最后 3 秒) 仍正常
@@ -112,7 +112,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [P] [US2] Add expandable voice announcement section with three TextFields to Block editor in `src/Views/Components/BlockEditorRow.swift`
+- [X] T009 [P] [US2] Add expandable voice announcement section with three TextFields to Block editor in `src/Views/Components/BlockEditorRow.swift`
   - Add a `DisclosureGroup` or expandable section titled "语音播报"
   - Three TextFields bound to `block.announcementStart`, `block.announcementRest`, `block.announcementContinue`
   - Each TextField shows placeholder with default value (e.g., `"默认：\(block.name)"`, `"默认：休息"`, `"默认：继续"`)
@@ -120,14 +120,14 @@
   - Data persists via SwiftData (Block model already has the properties)
   - Reference: spec US2 Acceptance Scenarios 1-4, Edge Cases
 
-- [ ] T010 [P] [US2] Add completion announcement TextField to Session editor in `src/Views/Session/SessionEditorView.swift`
+- [X] T010 [P] [US2] Add completion announcement TextField to Session editor in `src/Views/Session/SessionEditorView.swift`
   - Add a Section titled "语音播报" with a TextField for `session.announcementComplete`
   - Placeholder: `"默认：训练完成"`
   - If text length > 50 chars, show inline hint
   - Data persists via SwiftData (Session model already has the property)
   - Reference: spec US2 Acceptance Scenario 1, FR-005
 
-- [ ] T011 [US2] Build and verify custom announcement text on device by running `make run-device`
+- [X] T011 [US2] Build and verify custom announcement text on device by running `make run-device`
   - Edit a Block: set custom "开始播报" → verify custom text is spoken at block first work
   - Clear "休息播报" → verify default "休息" is spoken
   - Edit Session: set custom "完成播报" → verify custom text at session complete
@@ -146,14 +146,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Add voice announcement toggle to the main interface in `src/Views/Home/ContentView.swift`
+- [X] T012 [US3] Add voice announcement toggle to the main interface in `src/Views/Home/SessionListView.swift`
   - Add `@AppStorage("isVoiceAnnouncementEnabled") private var isVoiceAnnouncementEnabled: Bool = true`
   - Add a `Toggle` in toolbar or as a section in the main view for "语音播报"
   - Toggle binding: `$isVoiceAnnouncementEnabled`
   - The TimerViewModel already reads this flag (from T005), so changes take effect immediately at next phase transition
   - Reference: spec US3, FR-007, research § Task 5
 
-- [ ] T013 [US3] Build and verify toggle on device by running `make run-device`
+- [X] T013 [US3] Build and verify toggle on device by running `make run-device`
   - Toggle OFF → start timer → verify Work/Rest start sounds play (no voice)
   - Toggle ON → start timer → verify voice announcements play (no Work/Rest start sounds)
   - Toggle during active session → verify next phase transition respects new setting
@@ -168,14 +168,14 @@
 
 **Purpose**: Edge case handling, final validation across all stories.
 
-- [ ] T014 Verify edge cases on device: rapid phase switching (short durations), background/foreground transitions, music mixing behavior
+- [X] T014 Verify edge cases on device: rapid phase switching (short durations), background/foreground transitions, music mixing behavior
   - Create a Session with very short Work/Rest (e.g., 3s each) → verify speech interrupts and new announcement starts (FR-012)
   - Play background music → verify ducking behavior (Art. 2)
   - Lock screen → verify voice continues in background (FR-011)
   - Test with English text (e.g., Block named "Squat") → verify English voice (FR-009)
   - Test with mixed text (e.g., "C大调 Scale") → verify language detection (FR-009)
 
-- [ ] T015 Final build and complete acceptance validation by running `make run-device`
+- [X] T015 Final build and complete acceptance validation by running `make run-device`
   - Walk through ALL 6 acceptance scenarios from US1
   - Walk through ALL 4 acceptance scenarios from US2
   - Walk through ALL 3 acceptance scenarios from US3

@@ -25,6 +25,9 @@ final class Session {
     /// 是否收藏，收藏的 Session 显示在列表顶部
     var isFavorite: Bool
     
+    /// Session 完成时的播报文本，nil 或空字符串时回退到"训练完成"
+    var announcementComplete: String?
+    
     /// 包含的 Block 列表（级联删除）
     @Relationship(deleteRule: .cascade, inverse: \Block.session)
     var blocks: [Block]

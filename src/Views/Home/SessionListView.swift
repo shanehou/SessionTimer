@@ -19,6 +19,7 @@ struct SessionListView: View {
     
     @State private var viewModel: SessionListViewModel?
     @State private var showSessionEditor: Bool = false
+    @AppStorage("isVoiceAnnouncementEnabled") private var isVoiceAnnouncementEnabled: Bool = true
     
     // MARK: - Bindings
     
@@ -44,6 +45,18 @@ struct SessionListView: View {
             prompt: "搜索练习计划"
         )
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    isVoiceAnnouncementEnabled.toggle()
+                } label: {
+                    Image(systemName: isVoiceAnnouncementEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .foregroundStyle(isVoiceAnnouncementEnabled ? .blue : .secondary)
+                }
+                .accessibilityLabel("语音播报")
+                .accessibilityValue(isVoiceAnnouncementEnabled ? "已开启" : "已关闭")
+                .accessibilityHint("点击\(isVoiceAnnouncementEnabled ? "关闭" : "开启")语音播报")
+            }
+            
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showSessionEditor = true
