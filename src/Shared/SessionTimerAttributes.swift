@@ -52,9 +52,15 @@ struct SessionTimerAttributes: ActivityAttributes {
             phase == "work"
         }
         
+        /// 是否为 preparing 阶段
+        var isPreparingPhase: Bool {
+            phase == "preparing"
+        }
+        
         /// 阶段对应的颜色
         var phaseColor: Color {
-            isWorkPhase ? .orange : .green
+            if isPreparingPhase { return .blue }
+            return isWorkPhase ? .orange : .green
         }
         
         /// 组进度 (0.0 - 1.0)
@@ -97,6 +103,7 @@ struct SessionTimerAttributes: ActivityAttributes {
             if isPaused {
                 return "PAUSED"
             }
+            if isPreparingPhase { return "准备" }
             return isWorkPhase ? "WORK" : "REST"
         }
         

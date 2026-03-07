@@ -22,24 +22,31 @@ struct TimerDisplay: View {
             // 状态指示器
             statusIndicator
             
-            // Block 名称
-            Text(blockName)
-                .font(.title2)
-                .fontWeight(.medium)
-                .foregroundStyle(Color.textPrimary)
-                .accessibilityLabel("当前练习：\(blockName)")
+            if phase != .preparing {
+                // Block 名称（preparing 阶段不显示）
+                Text(blockName)
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.textPrimary)
+                    .accessibilityLabel("当前练习：\(blockName)")
+            }
             
             // 大号倒计时
             countdownDisplay
             
-            // 组数进度
-            Text("第 \(setProgress) 组")
-                .font(.title3)
-                .foregroundStyle(Color.textSecondary)
-                .accessibilityLabel("第\(setProgress)组")
+            if phase != .preparing {
+                // 组数进度（preparing 阶段不显示）
+                Text("第 \(setProgress) 组")
+                    .font(.title3)
+                    .foregroundStyle(Color.textSecondary)
+                    .accessibilityLabel("第\(setProgress)组")
+            }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(statusText)，\(blockName)，剩余\(formattedTime)，第\(setProgress)组")
+        .accessibilityLabel(phase == .preparing
+            ? "\(statusText)，剩余\(formattedTime)"
+            : "\(statusText)，\(blockName)，剩余\(formattedTime)，第\(setProgress)组"
+        )
     }
     
     // MARK: - Subviews
@@ -80,6 +87,8 @@ struct TimerDisplay: View {
             return Color.yellow.opacity(0.3)
         }
         switch phase {
+        case .preparing:
+            return Color.blue.opacity(0.3)
         case .work:
             return Color.orange.opacity(0.3)
         case .rest:

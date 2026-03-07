@@ -19,12 +19,16 @@ struct SessionListView: View {
     
     @State private var viewModel: SessionListViewModel?
     @State private var showSessionEditor: Bool = false
+    @State private var showQuickStart: Bool = false
     @AppStorage("isVoiceAnnouncementEnabled") private var isVoiceAnnouncementEnabled: Bool = true
     
     // MARK: - Bindings
     
     @Binding var navigationPath: NavigationPath
     @Binding var selectedSessionForDetail: Session?
+    
+    /// 快速开始创建的临时 Session，通过 binding 传递给 ContentView 导航
+    @Binding var quickStartSession: Session?
     
     // MARK: - Body
     
@@ -58,17 +62,32 @@ struct SessionListView: View {
             }
             
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showSessionEditor = true
-                } label: {
-                    Image(systemName: "plus")
+                HStack(spacing: 16) {
+                    Button {
+                        showQuickStart = true
+                    } label: {
+                        Image(systemName: "bolt.fill")
+                    }
+                    .accessibilityLabel("快速开始")
+                    .accessibilityHint("快速配置并立即开始计时")
+                    
+                    Button {
+                        showSessionEditor = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel("新建练习计划")
+                    .accessibilityHint("创建一个新的练习计划")
                 }
-                .accessibilityLabel("新建练习计划")
-                .accessibilityHint("创建一个新的练习计划")
             }
         }
         .sheet(isPresented: $showSessionEditor) {
             SessionEditorView()
+        }
+        .sheet(isPresented: $showQuickStart) {
+            QuickStartView { session in
+                quickStartSession = session
+            }
         }
         .alert(
             "确认删除",
@@ -128,7 +147,7 @@ struct SessionListView: View {
                             selectedSessionForDetail = session
                         },
                         onStart: {
-                            navigationPath.append(session)
+                            navigationPath.append(TimerDestination.saved(session))
                         }
                     )
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -162,7 +181,8 @@ struct SessionListView: View {
     NavigationStack {
         SessionListView(
             navigationPath: .constant(NavigationPath()),
-            selectedSessionForDetail: .constant(nil)
+            selectedSessionForDetail: .constant(nil),
+            quickStartSession: .constant(nil)
         )
     }
     .modelContainer(for: [Session.self, Block.self], inMemory: true)
@@ -172,7 +192,6 @@ struct SessionListView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Session.self, Block.self, configurations: config)
     
-    // 添加示例数据
     let block1 = Block(name: "深蹲", setCount: 3, workDuration: 30, restDuration: 10)
     let session1 = Session(name: "练腿日", blocks: [block1])
     session1.isFavorite = true
@@ -190,7 +209,8 @@ struct SessionListView: View {
     return NavigationStack {
         SessionListView(
             navigationPath: .constant(NavigationPath()),
-            selectedSessionForDetail: .constant(nil)
+            selectedSessionForDetail: .constant(nil),
+            quickStartSession: .constant(nil)
         )
     }
     .modelContainer(container)

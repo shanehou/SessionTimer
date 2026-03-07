@@ -10,6 +10,7 @@ struct ContentView: View {
     
     @State private var navigationPath = NavigationPath()
     @State private var selectedSessionForDetail: Session?
+    @State private var quickStartSession: Session?
     
     // MARK: - Body
     
@@ -17,25 +18,42 @@ struct ContentView: View {
         NavigationStack(path: $navigationPath) {
             SessionListView(
                 navigationPath: $navigationPath,
-                selectedSessionForDetail: $selectedSessionForDetail
+                selectedSessionForDetail: $selectedSessionForDetail,
+                quickStartSession: $quickStartSession
             )
-            .navigationDestination(for: Session.self) { session in
-                TimerView(session: session)
+            .navigationDestination(for: TimerDestination.self) { destination in
+                switch destination {
+                case .saved(let session):
+                    TimerView(session: session)
+                case .quickStart(let session):
+                    TimerView(session: session, isQuickStartMode: true)
+                }
             }
         }
         .sheet(item: $selectedSessionForDetail) { session in
             NavigationStack {
                 SessionDetailView(session: session) {
-                    // 关闭详情页并开始计时
                     selectedSessionForDetail = nil
-                    // 延迟一帧确保 sheet 关闭后再导航
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        navigationPath.append(session)
+                        navigationPath.append(TimerDestination.saved(session))
                     }
                 }
             }
         }
+        .onChange(of: quickStartSession) { _, newSession in
+            guard let session = newSession else { return }
+            quickStartSession = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                navigationPath.append(TimerDestination.quickStart(session))
+            }
+        }
     }
+}
+
+/// 计时器导航目的地
+enum TimerDestination: Hashable {
+    case saved(Session)
+    case quickStart(Session)
 }
 
 // MARK: - Preview
@@ -49,7 +67,6 @@ struct ContentView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Session.self, Block.self, configurations: config)
     
-    // 添加示例数据
     let block1 = Block(name: "深蹲", setCount: 3, workDuration: 30, restDuration: 10)
     let session1 = Session(name: "练腿日", blocks: [block1])
     session1.isFavorite = true

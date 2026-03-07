@@ -3,6 +3,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 import Combine
 
 /// 计时器 ViewModel
@@ -41,6 +42,15 @@ final class TimerViewModel {
     
     /// 是否已启动
     private(set) var isStarted: Bool = false
+    
+    /// 是否为快速开始模式
+    let isQuickStartMode: Bool
+    
+    /// 是否显示保存弹窗
+    var showSaveDialog: Bool = false
+    
+    /// 保存名称
+    var saveSessionName: String = ""
     
     // MARK: - Services
     
@@ -118,6 +128,7 @@ final class TimerViewModel {
     
     init(
         session: Session,
+        isQuickStartMode: Bool = false,
         timerService: TimerService = .shared,
         hapticService: HapticService = .shared,
         audioService: AudioService = .shared,
@@ -125,14 +136,21 @@ final class TimerViewModel {
         notificationService: NotificationService = .shared
     ) {
         self.session = session
+        self.isQuickStartMode = isQuickStartMode
         self.timerService = timerService
         self.hapticService = hapticService
         self.audioService = audioService
         self.screenService = screenService
         self.notificationService = notificationService
         
-        // 初始化状态
-        if let firstBlock = session.sortedBlocks.first {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        self.saveSessionName = "快速训练 \(formatter.string(from: Date()))"
+        
+        if session.preparingDuration > 0 {
+            self.remainingSeconds = session.preparingDuration
+            self.currentPhase = .preparing
+        } else if let firstBlock = session.sortedBlocks.first {
             self.remainingSeconds = firstBlock.workDuration
         }
         
@@ -268,7 +286,6 @@ final class TimerViewModel {
         screenService.onSessionEnd()
         audioService.endBackgroundAudioSession()
 
-        // 结束 Live Activity 并清除所有通知
         Task {
             await notificationService.endLiveActivity()
         }
@@ -276,6 +293,36 @@ final class TimerViewModel {
 
         isStarted = false
         isCompleted = false
+    }
+    
+    /// 停止计时（快速开始模式用，不重置 isCompleted）
+    func stopTimerOnly() {
+        timerService.stop()
+        screenService.onSessionEnd()
+        audioService.endBackgroundAudioSession()
+
+        Task {
+            await notificationService.endLiveActivity()
+        }
+        notificationService.cancelScheduledPhaseNotifications()
+
+        isStarted = false
+    }
+    
+    /// 保存快速开始 Session 到 ModelContext
+    func saveQuickStartSession(modelContext: ModelContext) {
+        guard isQuickStartMode else { return }
+        let name = saveSessionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        session.name = name.isEmpty ? saveSessionName : name
+        session.createdAt = Date()
+        modelContext.insert(session)
+        try? modelContext.save()
+        showSaveDialog = false
+    }
+    
+    /// 丢弃快速开始 Session
+    func discardQuickStartSession() {
+        showSaveDialog = false
     }
     
     /// 加一组
@@ -299,6 +346,8 @@ final class TimerViewModel {
     /// 根据阶段、Block、组号解析播报文本
     private func resolveAnnouncementText(phase: TimerPhase, block: Block, set: Int) -> String {
         switch phase {
+        case .preparing:
+            return "准备"
         case .work where set == 1:
             let text = block.announcementStart ?? ""
             return text.isEmpty ? block.name : text
@@ -350,6 +399,8 @@ final class TimerViewModel {
             speechService.speak(text)
         } else {
             switch phase {
+            case .preparing:
+                break
             case .work:
                 audioService.playWorkStart()
             case .rest:
@@ -378,7 +429,6 @@ final class TimerViewModel {
         isCompleted = true
         isPaused = false
 
-        // 完成播报或音效（互斥）
         if isVoiceAnnouncementEnabled {
             let text = resolveCompletionText(session: session)
             speechService.speak(text)
@@ -387,20 +437,18 @@ final class TimerViewModel {
         }
         hapticService.playSessionComplete()
 
-        // 重置屏幕状态
         screenService.onSessionEnd()
-
-        // 结束后台音频
         audioService.endBackgroundAudioSession()
-
-        // 取消预调度的通知
         notificationService.cancelScheduledPhaseNotifications()
 
-        // 结束 Live Activity 并发送完成通知
         Task {
             await notificationService.endLiveActivity()
         }
         notificationService.sendSessionCompleteNotification(sessionName: session.name)
+        
+        if isQuickStartMode {
+            showSaveDialog = true
+        }
     }
     
     /// 处理计时器事件
@@ -504,6 +552,6 @@ extension TimerViewModel {
         block2.orderIndex = 1
         
         let session = Session(name: "练腿日", blocks: [block1, block2])
-        return TimerViewModel(session: session)
+        return TimerViewModel(session: session, isQuickStartMode: false)
     }
 }

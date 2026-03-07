@@ -2,6 +2,7 @@
 // Session Timer - 计时器全屏视图
 
 import SwiftUI
+import SwiftData
 
 /// 计时器视图
 /// 支持全屏手势控制：单击暂停/继续，双击跳过，长按结束
@@ -9,19 +10,22 @@ struct TimerView: View {
     // MARK: - Environment
     
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     
     // MARK: - State
     
-    // 使用 @State 持有 ViewModel 的所有权，确保不会被重新创建
     @State private var viewModel: TimerViewModel
     @State private var showStopConfirmation: Bool = false
     @State private var showAdjustmentSheet: Bool = false
     
+    /// 是否为快速开始模式
+    private let isQuickStartMode: Bool
+    
     // MARK: - Initializer
     
-    init(session: Session) {
-        // 使用 _viewModel 直接初始化 State wrapper
-        self._viewModel = State(wrappedValue: TimerViewModel(session: session))
+    init(session: Session, isQuickStartMode: Bool = false) {
+        self._viewModel = State(wrappedValue: TimerViewModel(session: session, isQuickStartMode: isQuickStartMode))
+        self.isQuickStartMode = isQuickStartMode
     }
     
     // MARK: - Body
@@ -58,8 +62,7 @@ struct TimerView: View {
             }
             .padding()
             
-            // 完成覆盖层
-            if viewModel.isCompleted {
+            if viewModel.isCompleted && !isQuickStartMode {
                 SessionCompleteView(
                     session: viewModel.session,
                     onDismiss: {
@@ -116,8 +119,13 @@ struct TimerView: View {
             titleVisibility: .visible
         ) {
             Button("结束练习", role: .destructive) {
-                viewModel.stop()
-                dismiss()
+                if isQuickStartMode {
+                    viewModel.stopTimerOnly()
+                    viewModel.showSaveDialog = true
+                } else {
+                    viewModel.stop()
+                    dismiss()
+                }
             }
             Button("取消", role: .cancel) {}
         } message: {
@@ -126,6 +134,24 @@ struct TimerView: View {
         .sheet(isPresented: $showAdjustmentSheet) {
             AdjustmentSheet(viewModel: viewModel)
                 .presentationDetents([.height(250)])
+        }
+        .alert(
+            "保存训练计划",
+            isPresented: $viewModel.showSaveDialog
+        ) {
+            TextField("训练计划名称", text: $viewModel.saveSessionName)
+            Button("保存") {
+                viewModel.saveQuickStartSession(modelContext: modelContext)
+                viewModel.stop()
+                dismiss()
+            }
+            Button("不保存", role: .destructive) {
+                viewModel.discardQuickStartSession()
+                viewModel.stop()
+                dismiss()
+            }
+        } message: {
+            Text("是否将本次训练保存为计划？")
         }
     }
     

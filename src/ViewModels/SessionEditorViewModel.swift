@@ -90,6 +90,9 @@ final class SessionEditorViewModel {
     /// Session 完成播报文本
     var announcementComplete: String = ""
     
+    /// 预备倒计时时长（秒），0 = 不启用，范围 0-30
+    var preparingDuration: Int = 0
+    
     /// Block 列表
     var blocks: [EditableBlock] = []
     
@@ -154,6 +157,7 @@ final class SessionEditorViewModel {
         self.editingSessionId = session.id
         self.name = session.name
         self.announcementComplete = session.announcementComplete ?? ""
+        self.preparingDuration = session.preparingDuration
         self.blocks = session.sortedBlocks.map { EditableBlock(from: $0) }
     }
     
@@ -265,9 +269,9 @@ final class SessionEditorViewModel {
                 throw ValidationError.sessionNotFound
             }
             
-            // 更新名称和播报文本
             session.name = trimmedName
             session.announcementComplete = announcementComplete.isEmpty ? nil : announcementComplete
+            session.preparingDuration = preparingDuration
             
             // 删除旧的 Blocks
             for block in session.blocks {
@@ -288,7 +292,7 @@ final class SessionEditorViewModel {
                 editableBlock.toBlock(orderIndex: index)
             }
             
-            let session = Session(name: trimmedName, blocks: newBlocks)
+            let session = Session(name: trimmedName, preparingDuration: preparingDuration, blocks: newBlocks)
             session.announcementComplete = announcementComplete.isEmpty ? nil : announcementComplete
             modelContext.insert(session)
             

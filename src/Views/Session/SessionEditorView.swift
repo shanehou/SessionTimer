@@ -37,16 +37,10 @@ struct SessionEditorView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Session 名称
                 sessionNameSection
-                
-                // Block 列表
+                preparingSection
                 blocksSection
-                
-                // 语音播报
                 announcementSection
-                
-                // 摘要信息
                 summarySection
             }
             .navigationTitle(viewModel.isEditing ? "编辑练习计划" : "新建练习计划")
@@ -94,6 +88,17 @@ struct SessionEditorView: View {
             Text("名称")
         } footer: {
             Text("给你的练习计划起个名字，如「练腿日」或「音阶练习」")
+        }
+    }
+    
+    /// 预备时间配置区
+    private var preparingSection: some View {
+        Section {
+            Stepper("预备时间：\(viewModel.preparingDuration) 秒", value: $viewModel.preparingDuration, in: 0...30)
+        } header: {
+            Text("预备倒计时")
+        } footer: {
+            Text("计时开始前的准备时间，设为 0 则跳过")
         }
     }
     

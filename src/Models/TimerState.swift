@@ -35,11 +35,14 @@ struct TimerState: Sendable {
         self.sessionId = session.id
         self.currentBlockIndex = 0
         self.currentSet = 1
-        self.currentPhase = .work
         
-        // 获取第一个 Block 的 workDuration
-        let firstBlock = session.sortedBlocks.first
-        self.remainingSeconds = firstBlock?.workDuration ?? 0
+        if session.preparingDuration > 0 {
+            self.currentPhase = .preparing
+            self.remainingSeconds = session.preparingDuration
+        } else {
+            self.currentPhase = .work
+            self.remainingSeconds = session.sortedBlocks.first?.workDuration ?? 0
+        }
         
         self.isPaused = false
     }
@@ -82,7 +85,9 @@ struct TimerState: Sendable {
         let currentBlock = sortedBlocks[currentBlockIndex]
         elapsed += (currentSet - 1) * currentBlock.setDuration
         
-        // 当前阶段已用时间
+        // preparing 阶段不计入总进度
+        guard currentPhase != .preparing else { return 0 }
+        
         let phaseDuration = currentPhase == .work
             ? currentBlock.workDuration
             : currentBlock.restDuration
@@ -132,29 +137,29 @@ extension TimerState {
         var state = self
         
         switch currentPhase {
+        case .preparing:
+            state.currentPhase = .work
+            state.currentBlockIndex = 0
+            state.currentSet = 1
+            state.remainingSeconds = sortedBlocks.first?.workDuration ?? 0
+            
         case .work:
-            // Work → Rest
             state.currentPhase = .rest
             state.remainingSeconds = currentBlock.restDuration
             
         case .rest:
-            // Rest → 下一组 Work 或下一个 Block
             if currentSet < currentBlock.setCount {
-                // 还有更多组
                 state.currentSet += 1
                 state.currentPhase = .work
                 state.remainingSeconds = currentBlock.workDuration
             } else {
-                // 当前 Block 完成，进入下一个 Block
                 let nextBlockIndex = currentBlockIndex + 1
                 if nextBlockIndex < sortedBlocks.count {
-                    // 还有更多 Block
                     state.currentBlockIndex = nextBlockIndex
                     state.currentSet = 1
                     state.currentPhase = .work
                     state.remainingSeconds = sortedBlocks[nextBlockIndex].workDuration
                 } else {
-                    // Session 完成
                     return nil
                 }
             }

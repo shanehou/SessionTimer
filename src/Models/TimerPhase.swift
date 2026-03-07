@@ -5,6 +5,8 @@ import Foundation
 
 /// 计时器的当前阶段
 enum TimerPhase: String, Codable, Sendable, CaseIterable {
+    /// 预备阶段
+    case preparing
     /// 练习阶段
     case work
     /// 休息阶段
@@ -13,6 +15,8 @@ enum TimerPhase: String, Codable, Sendable, CaseIterable {
     /// 阶段显示名称
     var displayName: String {
         switch self {
+        case .preparing:
+            return "准备"
         case .work:
             return "WORK"
         case .rest:
@@ -20,9 +24,11 @@ enum TimerPhase: String, Codable, Sendable, CaseIterable {
         }
     }
     
-    /// 切换到下一个阶段
+    /// 切换到下一个阶段（仅用于 work/rest 循环）
     var next: TimerPhase {
         switch self {
+        case .preparing:
+            return .work
         case .work:
             return .rest
         case .rest:

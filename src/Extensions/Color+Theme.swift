@@ -6,6 +6,9 @@ import SwiftUI
 extension Color {
     // MARK: - Timer Phase Colors
     
+    /// Preparing 阶段背景色 - 蓝色
+    static let preparingBackground = Color.blue
+    
     /// Work 阶段背景色 - 黑色
     static let workBackground = Color.black
     
@@ -35,6 +38,8 @@ extension Color {
     /// - Returns: 对应的背景颜色
     static func background(for phase: TimerPhase) -> Color {
         switch phase {
+        case .preparing:
+            return .preparingBackground
         case .work:
             return .workBackground
         case .rest:

@@ -17,9 +17,9 @@
 
 **⚠️ CRITICAL**: 所有用户故事的实现必须等待本阶段完成
 
-- [ ] T001 Add `preparingDuration: Int` field (default `0`, range 0-30) to Session model in `src/Models/Session.swift` — 轻量级迁移，现有 Session 自动获得默认值 0
-- [ ] T002 [P] Add `.preparing` case to TimerPhase enum in `src/Models/TimerPhase.swift` — 包括 `backgroundColor` (Color.blue/#007AFF)、`statusLabel` ("准备") 等关联属性扩展
-- [ ] T003 [P] Create QuickStartCache singleton in `src/Models/QuickStartCache.swift` — `@Observable` 单例，包含 `BlockConfig` struct (name/setCount/workDuration/restDuration)、`save()`、`load()` 方法，纯内存不持久化
+- [X] T001 Add `preparingDuration: Int` field (default `0`, range 0-30) to Session model in `src/Models/Session.swift` — 轻量级迁移，现有 Session 自动获得默认值 0
+- [X] T002 [P] Add `.preparing` case to TimerPhase enum in `src/Models/TimerPhase.swift` — 包括 `backgroundColor` (Color.blue/#007AFF)、`statusLabel` ("准备") 等关联属性扩展
+- [X] T003 [P] Create QuickStartCache singleton in `src/Models/QuickStartCache.swift` — `@Observable` 单例，包含 `BlockConfig` struct (name/setCount/workDuration/restDuration)、`save()`、`load()` 方法，纯内存不持久化
 
 **Checkpoint**: 编译通过，现有功能不受影响（所有 Session 的 preparingDuration = 0，TimerPhase 新 case 在现有代码中无引用）
 
@@ -33,11 +33,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Implement QuickStartViewModel in `src/ViewModels/QuickStartViewModel.swift` — `@Observable` class，包含 `blocks: [EditableQuickStartBlock]` (单 block 初始化)、`preparingDuration: Int`、`canStart` 计算属性、`createSession() -> Session` 方法（创建非持久化 Session + Block 对象，写入 QuickStartCache）；init 从 QuickStartCache 加载缓存或使用默认值（"项目 1", 3组, 30s/15s）
-- [ ] T005 [US1] Implement QuickStartView in `src/Views/QuickStart/QuickStartView.swift` — Sheet 呈现，垂直布局：Block 配置卡片（名称 TextField、组数 Stepper、练习时长 DurationPicker、休息时长 DurationPicker）+ 底部固定"开始训练"按钮（`canStart` 为 false 时禁用）；调用 `createSession()` 后 dismiss sheet 并通过 binding 触发导航到 TimerView
-- [ ] T006 [US1] Add quick start entry button to `src/Views/Home/SessionListView.swift` — 在 toolbar 或列表顶部添加"快速开始"按钮，点击后通过 binding 触发 ContentView 显示 QuickStartView sheet
-- [ ] T007 [US1] Wire QuickStartView sheet presentation and TimerView navigation in `src/Views/Home/ContentView.swift` — 添加 `showQuickStart` sheet 状态、`quickStartSession` 导航状态；QuickStartView dismiss 后将临时 Session push 到 navigationPath，TimerView 接收 `isQuickStartMode: Bool` 参数（默认 false）
-- [ ] T008 [US1] Run `xcodegen generate` and verify build and basic flow with `make run-device`
+- [X] T004 [US1] Implement QuickStartViewModel in `src/ViewModels/QuickStartViewModel.swift`
+- [X] T005 [US1] Implement QuickStartView in `src/Views/QuickStart/QuickStartView.swift`
+- [X] T006 [US1] Add quick start entry button to `src/Views/Home/SessionListView.swift`
+- [X] T007 [US1] Wire QuickStartView sheet presentation and TimerView navigation in `src/Views/Home/ContentView.swift`
+- [X] T008 [US1] Run `xcodegen generate` and verify build and basic flow with `make run-device`
 
 **Checkpoint**: 用户可以从主页进入快速开始，配置单个项目，点击开始进入现有 TimerView 计时。训练结束后回到主页（此时无保存弹窗）。再次打开快速开始，上次配置自动恢复
 
@@ -51,9 +51,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Add multi-block management to `src/ViewModels/QuickStartViewModel.swift` — 实现 `addBlock()` (名称自动递增 "项目 N")、`removeBlock(at:)` (blocks.count > 1 时允许)、`moveBlock(from:to:)` 方法
-- [ ] T010 [US2] Add multi-block UI to `src/Views/QuickStart/QuickStartView.swift` — 在 Block 列表底部添加"＋ 添加项目"按钮；每个 Block 卡片添加删除按钮（仅剩一个时隐藏）；支持 `onMove` 拖拽排序；列表使用 ScrollView 支持大量项目滚动
-- [ ] T011 [US2] Verify multi-block quick start flow with `make run-device` — 添加 3+ 个项目，验证计时器按顺序执行所有项目的所有组
+- [X] T009 [US2] Add multi-block management to `src/ViewModels/QuickStartViewModel.swift`
+- [X] T010 [US2] Add multi-block UI to `src/Views/QuickStart/QuickStartView.swift`
+- [X] T011 [US2] Verify multi-block quick start flow with `make run-device`
 
 **Checkpoint**: 用户可以在快速开始页面添加、删除、重排多个项目，计时器按顺序正确执行
 
@@ -67,9 +67,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Add quick start save logic to `src/ViewModels/TimerViewModel.swift` — 新增 `isQuickStartMode: Bool` 属性（init 参数）、`showSaveDialog: Bool`、`saveSessionName: String`（默认 "快速训练 yyyy-MM-dd HH:mm"）；新增 `saveQuickStartSession(modelContext:)` 方法（`session.name = saveSessionName` → `modelContext.insert(session)` → `modelContext.save()`）和 `discardQuickStartSession()` 方法；在 session 完成或手动结束时，若 `isQuickStartMode` 则设置 `showSaveDialog = true`
-- [ ] T013 [US3] Add save dialog UI to `src/Views/Timer/TimerView.swift` — 使用 `.alert` 实现两步保存弹窗：第一步 "是否将本次训练保存为计划？" → [保存] [不保存]；选择保存后第二步 alert 带 TextField 输入名称（预填默认值）→ [确认] [取消]；名称为空时使用默认名称；调用 ViewModel 对应方法后 pop 导航返回主页
-- [ ] T014 [US3] Verify save flow with `make run-device` — 快速开始后保存，验证 Session 出现在列表中且可正常查看、编辑、启动；验证选择不保存时无数据残留
+- [X] T012 [US3] Add quick start save logic to `src/ViewModels/TimerViewModel.swift`
+- [X] T013 [US3] Add save dialog UI to `src/Views/Timer/TimerView.swift`
+- [X] T014 [US3] Verify save flow with `make run-device`
 
 **Checkpoint**: 快速开始训练结束后出现保存弹窗，保存成功的 Session 在主页可见且功能完整
 
@@ -83,17 +83,17 @@
 
 ### Implementation for User Story 4
 
-- [ ] T015 [US4] Add preparing → work transition logic to `src/Models/TimerState.swift` — 在 `nextPhase(in:)` 方法中添加 `.preparing` case 处理：remaining → 0 时切换到 `(blockIndex: 0, set: 1, phase: .work, remaining: firstBlock.workDuration)`；preparing 仅在 session 最开始执行一次
-- [ ] T016 [US4] Modify `start()` to support preparing phase in `src/Services/TimerService.swift` — 当 `session.preparingDuration > 0` 时，初始 TimerState 使用 `phase: .preparing, remainingSeconds: preparingDuration`；为 0 时保持现有行为不变
-- [ ] T017 [P] [US4] Add preparing phase sensory feedback in `src/ViewModels/TimerViewModel.swift` — 处理 `phaseChanged(.preparing, .work)` 事件：AudioService 播放"开始"提示音 + HapticService Heavy Impact；处理 preparing 最后 3 秒的 `countdownTick` 事件：倒数提示音 + Warning haptic
-- [ ] T018 [P] [US4] Add preparing phase visual display in `src/Views/Timer/TimerDisplay.swift` — `.preparing` 阶段：蓝底白字背景 (Color.blue)、状态标签显示"准备"、倒计时数字 128pt 单色字体；不显示组进度信息（尚未开始正式计时）
-- [ ] T019 [US4] Verify preparing phase gesture support in `src/Views/Timer/TimerView.swift` — 确认 preparing 阶段继承所有现有手势：单击暂停/继续、双击跳过（→ 直接进入 work）、长按结束；如有 phase-specific 条件判断需要更新
-- [ ] T020 [US4] Add preparingDuration property to `src/ViewModels/SessionEditorViewModel.swift` — 新增 `preparingDuration: Int` 属性 (0-30)，在 `init` 从 Session 加载、`save()` 时写回 Session
-- [ ] T021 [P] [US4] Add preparing duration picker to `src/Views/QuickStart/QuickStartView.swift` — 在 Block 列表上方添加"预备时间"配置项（Stepper 0-30 秒），绑定 QuickStartViewModel.preparingDuration
-- [ ] T022 [P] [US4] Add preparing duration picker to `src/Views/Session/SessionEditorView.swift` — 添加"预备时间"Stepper/Picker (0-30秒)，绑定 SessionEditorViewModel.preparingDuration
-- [ ] T023 [US4] Update Live Activity and Dynamic Island for preparing phase in `src/Shared/SessionTimerAttributes.swift` and `src-widgets/LiveActivityView.swift` — preparing 阶段显示"准备"状态和倒计时，使用蓝色主题色，不显示组进度
-- [ ] T024 [US4] Update ScreenService for preparing phase in `src/Services/ScreenService.swift` — preparing 阶段保持屏幕常亮（与 Work 阶段一致）
-- [ ] T025 [US4] Verify preparing countdown end-to-end with `make run-device` — 测试快速开始 + 预备倒计时、已保存 Session + 预备倒计时、preparingDuration=0 跳过、双击跳过预备、暂停/继续预备
+- [X] T015 [US4] Add preparing → work transition logic to `src/Models/TimerState.swift`
+- [X] T016 [US4] Modify `start()` to support preparing phase in `src/Services/TimerService.swift`
+- [X] T017 [P] [US4] Add preparing phase sensory feedback in `src/ViewModels/TimerViewModel.swift`
+- [X] T018 [P] [US4] Add preparing phase visual display in `src/Views/Timer/TimerDisplay.swift`
+- [X] T019 [US4] Verify preparing phase gesture support in `src/Views/Timer/TimerView.swift`
+- [X] T020 [US4] Add preparingDuration property to `src/ViewModels/SessionEditorViewModel.swift`
+- [X] T021 [P] [US4] Add preparing duration picker to `src/Views/QuickStart/QuickStartView.swift`
+- [X] T022 [P] [US4] Add preparing duration picker to `src/Views/Session/SessionEditorView.swift`
+- [X] T023 [US4] Update Live Activity and Dynamic Island for preparing phase
+- [X] T024 [US4] Update ScreenService for preparing phase in `src/Services/ScreenService.swift`
+- [X] T025 [US4] Verify preparing countdown end-to-end with `make run-device`
 
 **Checkpoint**: 预备倒计时在快速开始和已保存 Session 中均正常工作，蓝底白字视觉正确，手势/音效/触觉反馈完整
 
@@ -103,10 +103,10 @@
 
 **Purpose**: 边界情况处理与最终验证
 
-- [ ] T026 [P] Handle edge case: work/rest duration = 0 auto-skip verification — 在快速开始中设置 workDuration=0 或 restDuration=0，验证对应阶段被正确跳过
-- [ ] T027 [P] Handle edge case: large number of blocks (>20) scrolling performance — 在快速开始页面添加 20+ 个项目，验证滚动流畅
-- [ ] T028 Handle edge case: App backgrounding during quick start — 验证后台计时、Live Activity 更新、前台恢复行为与已保存 Session 一致
-- [ ] T029 Final end-to-end validation with `make run-device` — 完整流程：快速开始 → 多项目 → 预备倒计时 → 计时 → 保存 → 验证保存的 Session
+- [X] T026 [P] Handle edge case: work/rest duration = 0 auto-skip verification
+- [X] T027 [P] Handle edge case: large number of blocks (>20) scrolling performance
+- [X] T028 Handle edge case: App backgrounding during quick start
+- [X] T029 Final end-to-end validation with `make run-device`
 
 ---
 

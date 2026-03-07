@@ -44,44 +44,46 @@ struct LiveActivityView: View {
             
             Spacer()
             
-            // 右侧：进度信息
-            VStack(alignment: .trailing, spacing: 8) {
-                // Session 名称
-                Text(context.attributes.sessionName)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
-                    .lineLimit(1)
-                
-                // 组进度：圆形指示器
-                ZStack {
-                    Circle()
-                        .stroke(.white.opacity(0.2), lineWidth: 3)
+            if !state.isPreparingPhase {
+                // 右侧：进度信息（preparing 阶段不显示）
+                VStack(alignment: .trailing, spacing: 8) {
+                    Text(context.attributes.sessionName)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.6))
+                        .lineLimit(1)
                     
-                    Circle()
-                        .trim(from: 0, to: state.setProgressValue)
-                        .stroke(state.phaseColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                    
-                    VStack(spacing: 0) {
-                        Text(state.setProgressText)
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.white)
+                    ZStack {
+                        Circle()
+                            .stroke(.white.opacity(0.2), lineWidth: 3)
                         
-                        Text("SET")
-                            .font(.system(size: 8, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.5))
+                        Circle()
+                            .trim(from: 0, to: state.setProgressValue)
+                            .stroke(state.phaseColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                        
+                        VStack(spacing: 0) {
+                            Text(state.setProgressText)
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                .foregroundStyle(.white)
+                            
+                            Text("SET")
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
                     }
+                    .frame(width: 50, height: 50)
+                    
+                    Text("Block \(state.blockProgressText(totalBlocks: context.attributes.totalBlocks))")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.6))
                 }
-                .frame(width: 50, height: 50)
-                
-                // Block 进度
-                Text("Block \(state.blockProgressText(totalBlocks: context.attributes.totalBlocks))")
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
             }
         }
         .padding(16)
-        .activityBackgroundTint(state.isWorkPhase ? .black : Color(red: 0.05, green: 0.2, blue: 0.05))
+        .activityBackgroundTint(
+            state.isPreparingPhase ? .blue :
+            state.isWorkPhase ? .black : Color(red: 0.05, green: 0.2, blue: 0.05)
+        )
     }
 }
 

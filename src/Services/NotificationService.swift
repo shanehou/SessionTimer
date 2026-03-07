@@ -156,6 +156,8 @@ final class NotificationService {
         content.interruptionLevel = .timeSensitive
         
         switch phase {
+        case .preparing:
+            return
         case .work:
             content.title = "开始练习"
             content.body = "\(blockName) - WORK"
@@ -247,6 +249,8 @@ final class NotificationService {
             let block = sortedBlocks[blockIndex]
 
             switch nextState.currentPhase {
+            case .preparing:
+                break
             case .work:
                 scheduleNotification(
                     identifier: "\(Self.scheduledNotificationPrefix)\(index)",

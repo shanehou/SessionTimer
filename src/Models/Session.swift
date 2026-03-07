@@ -28,6 +28,9 @@ final class Session {
     /// Session 完成时的播报文本，nil 或空字符串时回退到"练习完成"
     var announcementComplete: String?
     
+    /// 预备倒计时时长（秒），0 = 不启用预备倒计时，范围 0-30
+    var preparingDuration: Int = 0
+    
     /// 包含的 Block 列表（级联删除）
     @Relationship(deleteRule: .cascade, inverse: \Block.session)
     var blocks: [Block]
@@ -59,6 +62,7 @@ final class Session {
     ///   - blocks: 初始 Block 列表，默认为空
     init(
         name: String,
+        preparingDuration: Int = 0,
         blocks: [Block] = []
     ) {
         self.id = UUID()
@@ -66,6 +70,7 @@ final class Session {
         self.createdAt = Date()
         self.lastUsedAt = nil
         self.isFavorite = false
+        self.preparingDuration = min(max(preparingDuration, 0), 30)
         self.blocks = blocks
     }
     

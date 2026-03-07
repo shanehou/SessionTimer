@@ -37,12 +37,10 @@ final class ScreenService {
         }
         
         switch phase {
-        case .work:
-            // Work 阶段始终保持屏幕常亮
+        case .preparing, .work:
             setScreenAlwaysOn(true)
             
         case .rest:
-            // 短休息保持常亮，长休息关闭
             if restDuration > longRestThreshold {
                 setScreenAlwaysOn(false)
             } else {
