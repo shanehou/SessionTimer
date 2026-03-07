@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-03-04
 
 ## Active Technologies
+- Swift 6.0, Strict Concurrency + SwiftUI, SwiftData, CADisplayLink, AVFoundation, ActivityKi (003-quick-start)
+- SwiftData with CloudKit sync (003-quick-start)
 
 - Swift 6.0, Strict Concurrency: complete + SwiftUI, SwiftData, AVFoundation (`AVSpeechSynthesizer`), NaturalLanguage (`NLLanguageRecognizer`) (002-voice-announcements)
 
@@ -22,6 +24,7 @@ tests/
 Swift 6.0, Strict Concurrency: complete: Follow standard conventions
 
 ## Recent Changes
+- 003-quick-start: Added Swift 6.0, Strict Concurrency + SwiftUI, SwiftData, CADisplayLink, AVFoundation, ActivityKi
 
 - 002-voice-announcements: Added Swift 6.0, Strict Concurrency: complete + SwiftUI, SwiftData, AVFoundation (`AVSpeechSynthesizer`), NaturalLanguage (`NLLanguageRecognizer`)
 
