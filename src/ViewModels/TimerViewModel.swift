@@ -314,7 +314,7 @@ final class TimerViewModel {
     /// 解析 Session 完成播报文本
     private func resolveCompletionText(session: Session) -> String {
         let text = session.announcementComplete ?? ""
-        return text.isEmpty ? "训练完成" : text
+        return text.isEmpty ? "练习完成" : text
     }
     
     // MARK: - Private Methods

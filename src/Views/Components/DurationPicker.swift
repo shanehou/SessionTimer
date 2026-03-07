@@ -57,7 +57,7 @@ struct DurationPicker: View {
                 label: label,
                 isPresented: $showPicker
             )
-            .presentationDetents([.height(300)])
+            .presentationDetents([.height(420)])
         }
     }
 }

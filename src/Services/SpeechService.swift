@@ -37,6 +37,11 @@ final class SpeechService {
     // MARK: - Private
 
     private func detectLanguage(for text: String) -> String {
+        // 含中文字符时优先使用中文语音，中文 TTS 能正确处理夹杂的英文
+        if containsChinese(text) {
+            return "zh-CN"
+        }
+
         let recognizer = NLLanguageRecognizer()
         recognizer.processString(text)
 
@@ -53,6 +58,13 @@ final class SpeechService {
             return "ja-JP"
         default:
             return "zh-CN"
+        }
+    }
+
+    private func containsChinese(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            (0x4E00...0x9FFF).contains(scalar.value) ||
+            (0x3400...0x4DBF).contains(scalar.value)
         }
     }
 

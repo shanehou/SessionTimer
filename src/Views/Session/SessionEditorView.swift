@@ -136,7 +136,7 @@ struct SessionEditorView: View {
     private var announcementSection: some View {
         Section {
             VStack(alignment: .leading, spacing: 4) {
-                TextField("默认：训练完成", text: $viewModel.announcementComplete)
+                TextField("默认：练习完成", text: $viewModel.announcementComplete)
                 if viewModel.announcementComplete.count > 50 {
                     Text("建议文本不超过 50 个字符")
                         .font(.caption2)
@@ -146,7 +146,7 @@ struct SessionEditorView: View {
         } header: {
             Text("语音播报")
         } footer: {
-            Text("训练完成时的播报文本，留空则使用默认值")
+            Text("练习完成时的播报文本，留空则使用默认值")
         }
     }
     
