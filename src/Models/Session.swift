@@ -179,6 +179,38 @@ extension Session {
     func markAsUsed() {
         lastUsedAt = Date()
     }
+
+    /// 收集该 Session 所有需要预生成的播报文本（含默认文本），已去重
+    var announcementTexts: [String] {
+        var seen = Set<String>()
+        var texts: [String] = []
+
+        func add(_ text: String) {
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty, seen.insert(trimmed).inserted else { return }
+            texts.append(trimmed)
+        }
+
+        if preparingDuration > 0 {
+            add("准备")
+        }
+
+        for block in sortedBlocks {
+            let startText = (block.announcementStart ?? "").isEmpty ? block.name : (block.announcementStart ?? "")
+            add(startText)
+
+            let restText = (block.announcementRest ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            add(restText.isEmpty ? "休息" : restText)
+
+            let continueText = (block.announcementContinue ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            add(continueText.isEmpty ? "继续" : continueText)
+        }
+
+        let completeText = (announcementComplete ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        add(completeText.isEmpty ? "练习完成" : completeText)
+
+        return texts
+    }
 }
 
 // MARK: - Hashable

@@ -123,6 +123,7 @@ final class SessionService {
     /// 删除 Session
     /// - Parameter session: 要删除的 Session
     func deleteSession(_ session: Session) {
+        SpeechService.shared.cleanupCache(for: session)
         modelContext.delete(session)
     }
     

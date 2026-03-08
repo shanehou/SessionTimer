@@ -11,6 +11,10 @@ struct SessionCard: View {
     let session: Session
     let onTap: () -> Void
     let onStart: () -> Void
+
+    private var generationStatus: AudioGenerationStatus? {
+        AudioGenerationTracker.shared.status(for: session.id)
+    }
     
     // MARK: - Body
     
@@ -18,7 +22,7 @@ struct SessionCard: View {
         HStack(spacing: 12) {
             // 主要内容
             VStack(alignment: .leading, spacing: 4) {
-                // 名称和收藏标记
+                // 名称、收藏标记和语音状态
                 HStack(spacing: 6) {
                     if session.isFavorite {
                         Image(systemName: "star.fill")
@@ -29,6 +33,8 @@ struct SessionCard: View {
                     Text(session.name)
                         .font(.headline)
                         .lineLimit(1)
+
+                    audioStatusBadge
                 }
                 
                 // 摘要信息
@@ -65,9 +71,31 @@ struct SessionCard: View {
         .onTapGesture {
             onTap()
         }
+        .onAppear {
+            AudioGenerationTracker.shared.refreshStatus(for: session)
+        }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(session.name)，\(session.summary)\(session.isFavorite ? "，已收藏" : "")")
+        .accessibilityLabel("\(session.name)，\(session.summary)\(session.isFavorite ? "，已收藏" : "")\(generationStatus == .ready ? "，语音已就绪" : "")")
         .accessibilityHint("点击查看详情")
+    }
+
+    // MARK: - Audio Status Badge
+
+    @ViewBuilder
+    private var audioStatusBadge: some View {
+        switch generationStatus {
+        case .generating:
+            ProgressView()
+                .controlSize(.mini)
+                .accessibilityLabel("正在生成语音")
+        case .ready:
+            Image(systemName: "waveform")
+                .font(.caption2)
+                .foregroundStyle(.green)
+                .accessibilityLabel("语音已就绪")
+        case nil:
+            EmptyView()
+        }
     }
 }
 

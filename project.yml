@@ -15,6 +15,8 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: false
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     CODE_SIGN_STYLE: Automatic
+    SWIFT_ENABLE_EXPLICIT_MODULES: "NO"
+    CLANG_ENABLE_EXPLICIT_MODULES: "NO"
 
 targets:
   SessionTimer:
@@ -38,9 +40,16 @@ targets:
         optional: true
       - path: src/Resources
         optional: true
+      - path: vendor/matcha-icefall-zh-en
+        type: folder
+        buildPhase: resources
+        optional: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: me.melkor.SessionTimer
+        SWIFT_INCLUDE_PATHS:
+          - "$(inherited)"
+          - "$(SRCROOT)/src/CModules/SherpaOnnx"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_EMIT_LOC_STRINGS: "YES"
         GENERATE_INFOPLIST_FILE: "YES"
@@ -57,6 +66,13 @@ targets:
     dependencies:
       - target: SessionTimerWidgets
         embed: true
+      - framework: vendor/sherpa-onnx.xcframework
+        embed: false
+      - framework: vendor/ios-onnxruntime/onnxruntime.xcframework
+        embed: false
+      - sdk: Accelerate.framework
+      - sdk: CoreML.framework
+      - sdk: libc++.tbd
 
   SessionTimerWidgets:
     type: app-extension

@@ -285,6 +285,7 @@ final class SessionEditorViewModel {
                 session.blocks.append(block)
             }
             
+            pregenerateAnnouncements(for: session)
             return session
         } else {
             // 创建模式：创建新 Session
@@ -296,8 +297,16 @@ final class SessionEditorViewModel {
             session.announcementComplete = announcementComplete.isEmpty ? nil : announcementComplete
             modelContext.insert(session)
             
+            pregenerateAnnouncements(for: session)
             return session
         }
+    }
+
+    /// 收集 Session 的所有播报文本并触发后台预生成
+    private func pregenerateAnnouncements(for session: Session) {
+        let texts = session.announcementTexts
+        guard !texts.isEmpty else { return }
+        SpeechService.shared.pregenerate(texts: texts, sessionId: session.id)
     }
     
     /// 清除验证错误
