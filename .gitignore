@@ -108,3 +108,6 @@ DerivedData/
 coverage/
 test-results/
 
+# vendor dependencies (fetched via scripts/setup-vendor.sh)
+vendor/
+

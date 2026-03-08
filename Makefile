@@ -1,4 +1,4 @@
-.PHONY: generate build run-simulator run-device test clean help
+.PHONY: generate build run-simulator run-device test clean help setup-vendor
 
 # Default simulator device
 SIMULATOR ?= iPhone 17 Pro
@@ -47,6 +47,10 @@ test-ui:
 	           -destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
 	           -only-testing:SessionTimerUITests \
 	           | xcbeautify
+
+setup-vendor:
+	@echo "📦 Setting up vendor dependencies..."
+	./scripts/setup-vendor.sh
 
 clean:
 	@echo "🧹 Cleaning build artifacts..."

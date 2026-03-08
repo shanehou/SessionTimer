@@ -84,6 +84,9 @@ struct SessionDetailView: View {
             }
             .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
             .listRowBackground(Color.clear)
+
+            // 语音生成状态
+            audioGenerationStatusRow
             
             // 开始按钮
             Button {
@@ -103,6 +106,36 @@ struct SessionDetailView: View {
             .listRowBackground(Color.clear)
             .accessibilityLabel("开始练习\(session.name)")
             .accessibilityHint("启动计时器开始此练习计划")
+        }
+        .onAppear {
+            AudioGenerationTracker.shared.refreshStatus(for: session)
+        }
+    }
+
+    /// 语音生成状态行
+    @ViewBuilder
+    private var audioGenerationStatusRow: some View {
+        let status = AudioGenerationTracker.shared.status(for: session.id)
+        if let status {
+            HStack(spacing: 8) {
+                switch status {
+                case .generating:
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("正在生成语音…")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                case .ready:
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("语音已就绪")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .padding(.vertical, 4)
+            .listRowBackground(Color.clear)
         }
     }
     
@@ -158,6 +191,7 @@ struct SessionDetailView: View {
     
     /// 删除 Session
     private func deleteSession() {
+        SpeechService.shared.cleanupCache(for: session)
         modelContext.delete(session)
         dismiss()
     }
